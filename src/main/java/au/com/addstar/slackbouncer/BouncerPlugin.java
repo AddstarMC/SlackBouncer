@@ -17,7 +17,10 @@ import com.google.common.collect.Maps;
 
 import au.com.addstar.slackapi.Channel;
 import au.com.addstar.slackapi.Group;
+import au.com.addstar.slackapi.events.MessageEvent;
 import au.com.addstar.slackapi.exceptions.SlackException;
+import au.com.addstar.slackbouncer.bouncers.BungeeChatBouncer;
+import au.com.addstar.slackbouncer.bouncers.GeSuitBouncer;
 import au.com.addstar.slackbouncer.bouncers.ISlackIncomingBouncer;
 import au.com.addstar.slackbouncer.bouncers.ISlackOutgoingBouncer;
 import au.com.addstar.slackbouncer.config.ChannelDefinition;
@@ -44,6 +47,17 @@ public class BouncerPlugin extends Plugin
 	public void onEnable()
 	{
 		config = new MainConfig(new File(getDataFolder(), "config.yml"));
+		
+		if (getProxy().getPluginManager().getPlugin("BungeeChat") != null)
+		{
+			registerIncomingBouncer("bungeechat", BungeeChatBouncer.class);
+			registerOutgoingBouncer("bungeechat", BungeeChatBouncer.class);
+		}
+		
+		if (getProxy().getPluginManager().getPlugin("geSuit") != null)
+		{
+			registerOutgoingBouncer("gesuit", GeSuitBouncer.class);
+		}
 		
 		if (!loadConfig())
 			return;
@@ -209,6 +223,11 @@ public class BouncerPlugin extends Plugin
 		}
 	}
 	
+	Bouncer getBouncer()
+	{
+		return bouncer;
+	}
+	
 	void onLoginComplete()
 	{
 		for (BouncerChannel bChannel : channels)
@@ -250,6 +269,17 @@ public class BouncerPlugin extends Plugin
 			else
 				// Is already a member, link the channel
 				bChannel.link(slackChannel);
+		}
+	}
+	
+	void onMessage(MessageEvent event)
+	{
+		String message = SlackUtils.resolveGroups(event.getMessage().getText(), bouncer.getSession());
+		
+		for (BouncerChannel channel : channels)
+		{
+			if (channel.getSlackChannel().getId().equals(event.getMessage().getSourceId()))
+				channel.onMessage(message, event.getUser(), event.getType());
 		}
 	}
 }

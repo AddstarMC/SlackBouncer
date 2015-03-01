@@ -1,5 +1,6 @@
 package au.com.addstar.slackbouncer;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -10,6 +11,10 @@ import net.md_5.bungee.api.plugin.Listener;
 import com.google.common.collect.Lists;
 
 import au.com.addstar.slackapi.Channel;
+import au.com.addstar.slackapi.MessageOptions;
+import au.com.addstar.slackapi.User;
+import au.com.addstar.slackapi.Message.MessageType;
+import au.com.addstar.slackapi.exceptions.SlackException;
 import au.com.addstar.slackbouncer.bouncers.ISlackIncomingBouncer;
 import au.com.addstar.slackbouncer.bouncers.ISlackOutgoingBouncer;
 import au.com.addstar.slackbouncer.config.ChannelDefinition;
@@ -44,6 +49,11 @@ public class BouncerChannel
 	public BouncerPlugin getPlugin()
 	{
 		return plugin;
+	}
+	
+	public Channel getSlackChannel()
+	{
+		return slackChannel;
 	}
 	
 	public void load(ChannelDefinition def)
@@ -98,5 +108,55 @@ public class BouncerChannel
 	void link(Channel channel)
 	{
 		slackChannel = channel;
+	}
+	
+	public void onMessage(String message, User sender, MessageType type)
+	{
+		for (ISlackIncomingBouncer bouncer : incoming)
+			bouncer.onMessage(message, sender, type);
+	}
+	
+	public void sendMessage(String message)
+	{
+		sendMessage(message, MessageOptions.DEFAULT);
+	}
+	
+	public void sendMessage(String message, User target)
+	{
+		sendMessage(message, target, MessageOptions.DEFAULT);
+	}
+	
+	public void sendMessage(String message, MessageOptions options)
+	{
+		try
+		{
+			plugin.getBouncer().getSlack().sendMessage(message, slackChannel, options);
+		}
+		catch (IOException e)
+		{
+			plugin.getLogger().severe("An IOException occurred while sending a message:");
+			e.printStackTrace();
+		}
+		catch (SlackException e)
+		{
+			plugin.getLogger().severe("Slack refused the message with: " + e.getMessage());
+		}
+	}
+	
+	public void sendMessage(String message, User target, MessageOptions options)
+	{
+		try
+		{
+			plugin.getBouncer().getSlack().sendMessage(String.format("<@%s> %s", target.getId(), message), slackChannel, options);
+		}
+		catch (IOException e)
+		{
+			plugin.getLogger().severe("An IOException occurred while sending a message:");
+			e.printStackTrace();
+		}
+		catch (SlackException e)
+		{
+			plugin.getLogger().severe("Slack refused the message with: " + e.getMessage());
+		}
 	}
 }

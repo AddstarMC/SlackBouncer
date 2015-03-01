@@ -7,6 +7,7 @@ import net.md_5.bungee.api.ProxyServer;
 import au.com.addstar.slackapi.RealTimeListener;
 import au.com.addstar.slackapi.RealTimeSession;
 import au.com.addstar.slackapi.SlackAPI;
+import au.com.addstar.slackapi.events.MessageEvent;
 import au.com.addstar.slackapi.events.RealTimeEvent;
 import au.com.addstar.slackapi.exceptions.SlackException;
 import au.com.addstar.slackapi.exceptions.SlackRTException;
@@ -82,7 +83,8 @@ public class Bouncer implements RealTimeListener
 	@Override
 	public void onEvent( RealTimeEvent event )
 	{
-		
+		if (event instanceof MessageEvent)
+			plugin.onMessage((MessageEvent)event);
 	}
 
 	@Override
