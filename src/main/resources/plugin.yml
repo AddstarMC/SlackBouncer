@@ -1,0 +1,5 @@
+name: SlackBouncer
+version: ${project.version}
+author: Schmoller
+
+main: au.com.addstar.slackbouncer.BouncerPlugin
