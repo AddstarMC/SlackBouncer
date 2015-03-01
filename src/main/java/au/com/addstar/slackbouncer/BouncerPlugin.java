@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,12 +18,17 @@ import com.google.common.collect.Maps;
 
 import au.com.addstar.slackapi.Channel;
 import au.com.addstar.slackapi.Group;
+import au.com.addstar.slackapi.User;
+import au.com.addstar.slackapi.Message.MessageType;
 import au.com.addstar.slackapi.events.MessageEvent;
 import au.com.addstar.slackapi.exceptions.SlackException;
 import au.com.addstar.slackbouncer.bouncers.BungeeChatBouncer;
 import au.com.addstar.slackbouncer.bouncers.GeSuitBouncer;
 import au.com.addstar.slackbouncer.bouncers.ISlackIncomingBouncer;
 import au.com.addstar.slackbouncer.bouncers.ISlackOutgoingBouncer;
+import au.com.addstar.slackbouncer.commands.GeSuitCommandHandler;
+import au.com.addstar.slackbouncer.commands.ISlackCommandHandler;
+import au.com.addstar.slackbouncer.commands.SlackCommandSender;
 import au.com.addstar.slackbouncer.config.ChannelDefinition;
 import au.com.addstar.slackbouncer.config.MainConfig;
 
@@ -30,6 +36,7 @@ public class BouncerPlugin extends Plugin
 {
 	private Map<String, Constructor<? extends ISlackIncomingBouncer>> incomingRegistrations;
 	private Map<String, Constructor<? extends ISlackOutgoingBouncer>> outgoingRegistrations;
+	private Map<String, ISlackCommandHandler> commandHandlers;
 	
 	private MainConfig config;
 	private Bouncer bouncer;
@@ -40,6 +47,7 @@ public class BouncerPlugin extends Plugin
 	{
 		incomingRegistrations = Maps.newHashMap();
 		outgoingRegistrations = Maps.newHashMap();
+		commandHandlers = Maps.newHashMap();
 		channels = Lists.newArrayList();
 	}
 	
@@ -57,6 +65,7 @@ public class BouncerPlugin extends Plugin
 		if (getProxy().getPluginManager().getPlugin("geSuit") != null)
 		{
 			registerOutgoingBouncer("gesuit", GeSuitBouncer.class);
+			registerCommandHandler(new GeSuitCommandHandler(), "seen", "where", "names", "warnhistory");
 		}
 		
 		if (!loadConfig())
@@ -156,6 +165,12 @@ public class BouncerPlugin extends Plugin
 		{
 			throw new IllegalArgumentException(bouncerClass.getName() + " does not have a public constructor that takes a BouncerChannel");
 		}
+	}
+	
+	public void registerCommandHandler(ISlackCommandHandler handler, String... commands)
+	{
+		for (String command : commands)
+			commandHandlers.put(command.toLowerCase(), handler);
 	}
 	
 	public MainConfig getConfig()
@@ -274,12 +289,70 @@ public class BouncerPlugin extends Plugin
 	
 	void onMessage(MessageEvent event)
 	{
+		if (event.getUser() == bouncer.getSession().getSelf())
+			return;
+		
 		String message = SlackUtils.resolveGroups(event.getMessage().getText(), bouncer.getSession());
 		
+		// Command handling
+		if (event.getType() == MessageType.Normal)
+		{
+			String user = bouncer.getSession().getSelf().getName().toLowerCase();
+			
+			if (message.toLowerCase().startsWith(user) || message.toLowerCase().startsWith("@" + user))
+			{
+				processCommands(event.getUser(), event.getMessage().getSourceId(), message);
+				return;
+			}
+		}
+		
+		// Process bouncers
 		for (BouncerChannel channel : channels)
 		{
 			if (channel.getSlackChannel().getId().equals(event.getMessage().getSourceId()))
 				channel.onMessage(message, event.getUser(), event.getType());
+		}
+	}
+	
+	private void processCommands(User source, String channel, String text)
+	{
+		SlackCommandSender sender = new SlackCommandSender(this, bouncer, source, bouncer.getSession().getChannelById(channel));
+		
+		String[] arguments = text.split(" ");
+		if (arguments.length < 2)
+		{
+			sender.sendMessage("You did not give me a command");
+			return;
+		}
+		
+		String command = arguments[1];
+		
+		if (command.equalsIgnoreCase("help") || command.equalsIgnoreCase("commands"))
+		{
+			// TODO: Show commands
+			return;
+		}
+		
+		ISlackCommandHandler handler = commandHandlers.get(command.toLowerCase());
+		if (handler == null)
+		{
+			sender.sendMessage("I dont know what to do with _" + command + "_");
+			return;
+		}
+		
+		arguments = Arrays.copyOfRange(arguments, 2, arguments.length);
+		
+		try
+		{
+			handler.onCommand(sender, command, arguments);
+		}
+		catch (IllegalArgumentException e)
+		{
+			sender.sendMessage(e.getMessage());
+		}
+		catch (IllegalStateException e)
+		{
+			sender.sendMessage("Usage: " + e.getMessage());
 		}
 	}
 }
