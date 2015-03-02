@@ -35,6 +35,7 @@ import au.com.addstar.slackbouncer.bouncers.ISlackIncomingBouncer;
 import au.com.addstar.slackbouncer.bouncers.ISlackOutgoingBouncer;
 import au.com.addstar.slackbouncer.commands.GeSuitCommandHandler;
 import au.com.addstar.slackbouncer.commands.ISlackCommandHandler;
+import au.com.addstar.slackbouncer.commands.ProxyCommandHandler;
 import au.com.addstar.slackbouncer.commands.SlackCommandSender;
 import au.com.addstar.slackbouncer.config.ChannelDefinition;
 import au.com.addstar.slackbouncer.config.MainConfig;
@@ -74,6 +75,8 @@ public class BouncerPlugin extends Plugin
 			registerOutgoingBouncer("gesuit", GeSuitBouncer.class);
 			registerCommandHandler(new GeSuitCommandHandler(), "seen", "where", "names", "warnhistory");
 		}
+		
+		registerCommandHandler(new ProxyCommandHandler(), "who", "list");
 		
 		if (!loadConfig())
 			return;
