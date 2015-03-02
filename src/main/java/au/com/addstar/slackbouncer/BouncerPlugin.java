@@ -19,10 +19,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import au.com.addstar.slackapi.Attachment;
+import au.com.addstar.slackapi.BaseChannel;
+import au.com.addstar.slackapi.DirectChannel;
 import au.com.addstar.slackapi.GroupChannel;
 import au.com.addstar.slackapi.MessageOptions;
 import au.com.addstar.slackapi.NormalChannel;
-import au.com.addstar.slackapi.ObjectID;
 import au.com.addstar.slackapi.User;
 import au.com.addstar.slackapi.Message.MessageType;
 import au.com.addstar.slackapi.MessageOptions.ParseMode;
@@ -299,15 +300,16 @@ public class BouncerPlugin extends Plugin
 			return;
 		
 		String message = SlackUtils.resolveGroups(event.getMessage().getText(), bouncer.getSession());
+		BaseChannel source = bouncer.getSession().getChannelById(event.getMessage().getSourceId());
 		
 		// Command handling
 		if (event.getType() == MessageType.Normal)
 		{
 			String user = bouncer.getSession().getSelf().getName().toLowerCase();
 			
-			if (message.toLowerCase().startsWith(user) || message.toLowerCase().startsWith("@" + user))
+			if (source instanceof DirectChannel || (message.toLowerCase().startsWith(user) || message.toLowerCase().startsWith("@" + user)))
 			{
-				processCommands(event.getUser(), event.getMessage().getSourceId(), message);
+				processCommands(event.getUser(), source, message);
 				return;
 			}
 		}
@@ -320,18 +322,30 @@ public class BouncerPlugin extends Plugin
 		}
 	}
 	
-	private void processCommands(User source, ObjectID channel, String text)
+	private void processCommands(User source, BaseChannel channel, String text)
 	{
-		SlackCommandSender sender = new SlackCommandSender(this, bouncer, source, bouncer.getSession().getChannelById(channel));
+		int start = 0;
+		
+		SlackCommandSender sender = new SlackCommandSender(this, bouncer, source, channel);
 		
 		String[] arguments = text.split(" ");
-		if (arguments.length < 2)
+		
+		if (arguments.length == 0)
+			return;
+		
+		String user = bouncer.getSession().getSelf().getName().toLowerCase();
+		if (arguments[0].equalsIgnoreCase(user) || arguments[0].equalsIgnoreCase("@" + user))
+			start = 1;
+		else
+			start = 0;
+		
+		if (arguments.length < start+1)
 		{
 			sender.sendMessage("You did not give me a command");
 			return;
 		}
 		
-		String command = arguments[1];
+		String command = arguments[start];
 		
 		if (command.equalsIgnoreCase("help") || command.equalsIgnoreCase("commands"))
 		{
@@ -373,7 +387,7 @@ public class BouncerPlugin extends Plugin
 			return;
 		}
 		
-		arguments = Arrays.copyOfRange(arguments, 2, arguments.length);
+		arguments = Arrays.copyOfRange(arguments, start+1, arguments.length);
 		
 		try
 		{
