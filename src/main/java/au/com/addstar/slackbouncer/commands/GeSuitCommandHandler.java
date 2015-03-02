@@ -31,6 +31,24 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 public class GeSuitCommandHandler implements ISlackCommandHandler
 {
 	@Override
+	public String getUsage( String command )
+	{
+		switch (command)
+		{
+		case "seen":
+			return "seen <player|uuid>";
+		case "where":
+			return "where <player|uuid>";
+		case "names":
+			return "names <player|uuid>";
+		case "warnhistory":
+			return "warnhistory <player|uuid>";
+		}
+		
+		return null;
+	}
+	
+	@Override
 	public void onCommand( SlackCommandSender sender, String command, String[] args ) throws IllegalStateException, IllegalArgumentException
 	{
 		switch (command)

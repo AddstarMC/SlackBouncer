@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -12,14 +13,18 @@ import java.util.Map.Entry;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.api.plugin.Plugin;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import au.com.addstar.slackapi.Attachment;
 import au.com.addstar.slackapi.Channel;
 import au.com.addstar.slackapi.Group;
+import au.com.addstar.slackapi.MessageOptions;
 import au.com.addstar.slackapi.User;
 import au.com.addstar.slackapi.Message.MessageType;
+import au.com.addstar.slackapi.MessageOptions.ParseMode;
 import au.com.addstar.slackapi.events.MessageEvent;
 import au.com.addstar.slackapi.exceptions.SlackException;
 import au.com.addstar.slackbouncer.bouncers.BungeeChatBouncer;
@@ -329,7 +334,34 @@ public class BouncerPlugin extends Plugin
 		
 		if (command.equalsIgnoreCase("help") || command.equalsIgnoreCase("commands"))
 		{
-			// TODO: Show commands
+			Attachment attachment = new Attachment("List of commands");
+			attachment.setTitle("The following commands are available");
+			
+			List<String> commands = Lists.newArrayList(commandHandlers.keySet());
+			Collections.sort(commands);
+			
+			for (int i = 0; i < commands.size(); ++i)
+			{
+				String cmd = commands.get(i);
+				ISlackCommandHandler handler = commandHandlers.get(cmd);
+				if (handler != null)
+					cmd = handler.getUsage(cmd);
+				
+				if (cmd != null)
+					commands.set(i, cmd);
+			}
+			
+			attachment.setText(Joiner.on('\n').join(commands));
+			attachment.setFormatText(false);
+			
+			sender.sendMessage("", 
+				MessageOptions.builder()
+					.asUser(true)
+					.attachments(Arrays.asList(attachment))
+					.mode(ParseMode.None)
+					.build()
+				);
+			
 			return;
 		}
 		
