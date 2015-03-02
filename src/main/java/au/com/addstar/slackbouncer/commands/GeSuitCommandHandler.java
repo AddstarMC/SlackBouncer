@@ -1,5 +1,7 @@
 package au.com.addstar.slackbouncer.commands;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -43,6 +45,10 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 			return "names <player|uuid>";
 		case "warnhistory":
 			return "warnhistory <player|uuid>";
+		case "banhistory":
+			return "banhistory <player|uuid>";
+		case "geo":
+			return "geo <ip>";
 		}
 		
 		return null;
@@ -64,6 +70,12 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 			break;
 		case "warnhistory":
 			onWarnHistory(sender, args);
+			break;
+		case "banhistory":
+			onBanHistory(sender, args);
+			break;
+		case "geo":
+			onGeoLookup(sender, args);
 			break;
 		}
 	}
@@ -262,6 +274,63 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 			);
 	}
 	
+	public void onBanHistory(SlackCommandSender sender, String[] args)
+	{
+		if ( args.length != 1 )
+			throw new IllegalStateException("banhistory <player|uuid>");
+		
+		GSPlayer target = PlayerManager.getPlayer(args[0]);
+		String targetId;
+		if ( target == null )
+		{
+			Map<String, UUID> ids = DatabaseManager.players.resolvePlayerNamesHistoric(Arrays.asList(args[0]));
+			UUID id = Iterables.getFirst(ids.values(), null);
+			if ( id == null )
+			{
+				sender.sendMessage(args[0] + " has never been banned", MessageOptions.DEFAULT);
+				return;
+			}
+			targetId = id.toString().replace("-", "");
+		}
+		else
+			targetId = target.getUuid();
+
+		List<Ban> bans = DatabaseManager.bans.getBanHistory(targetId);
+
+		if ( bans == null || bans.isEmpty() )
+		{
+			sender.sendMessage(args[0] + " has never been banned", MessageOptions.DEFAULT);
+			return;
+		}
+		
+		Attachment attachment = new Attachment("Ban History");
+		attachment.setTitle(args[0] + "'s Ban History");
+
+		List<String> lines = Lists.newArrayList();
+
+		for (Ban b : bans)
+		{
+			SimpleDateFormat sdf = new SimpleDateFormat();
+			sdf.applyPattern("dd MMM yyyy HH:mm");
+
+			if (b.getBannedUntil() == null)
+				lines.add(String.format("permban %s - %s by %s", sdf.format(b.getBannedOn()), b.getReason(), b.getBannedBy()));
+			else
+				lines.add(String.format("tempban %s - %s by %s until %s", sdf.format(b.getBannedOn()), b.getReason(), b.getBannedBy(), sdf.format(b.getBannedUntil())));
+		}
+		
+		attachment.setText(Joiner.on('\n').join(lines));
+		attachment.setFormatText(false);
+		
+		sender.sendMessage("Heres the results", 
+			MessageOptions.builder()
+				.asUser(true)
+				.attachments(Arrays.asList(attachment))
+				.mode(ParseMode.None)
+				.build()
+			);
+	}
+	
 	public void onNames(SlackCommandSender sender, String[] args)
 	{
 		if (args.length != 1)
@@ -307,5 +376,33 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 				.mode(ParseMode.None)
 				.build()
 			);
+	}
+	
+	private void onGeoLookup(SlackCommandSender sender, String[] args)
+	{
+		if (args.length != 1)
+			throw new IllegalStateException("geo <ip>");
+		
+		try
+		{
+			InetAddress address = InetAddress.getByName(args[0]);
+			if (address == null)
+			{
+				sender.sendMessage("That is not an address.", MessageOptions.DEFAULT);
+				return;
+			}
+			String location = GeoIPManager.lookup(address);
+			if (location == null)
+			{
+				sender.sendMessage("GeoIP lookups are not enabled", MessageOptions.DEFAULT);
+				return;
+			}
+			
+			sender.sendMessage(args[0] + " resolves to " + location, MessageOptions.DEFAULT);
+		}
+		catch (UnknownHostException e)
+		{
+			sender.sendMessage("Unable to resolve host " + args[0], MessageOptions.DEFAULT);
+		}
 	}
 }

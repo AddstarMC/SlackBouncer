@@ -73,7 +73,7 @@ public class BouncerPlugin extends Plugin
 		if (getProxy().getPluginManager().getPlugin("geSuit") != null)
 		{
 			registerOutgoingBouncer("gesuit", GeSuitBouncer.class);
-			registerCommandHandler(new GeSuitCommandHandler(), "seen", "where", "names", "warnhistory");
+			registerCommandHandler(new GeSuitCommandHandler(), "seen", "where", "names", "warnhistory", "banhistory", "geo");
 		}
 		
 		registerCommandHandler(new ProxyCommandHandler(), "who", "list");
