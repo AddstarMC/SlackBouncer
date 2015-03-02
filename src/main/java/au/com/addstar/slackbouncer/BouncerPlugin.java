@@ -19,9 +19,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import au.com.addstar.slackapi.Attachment;
-import au.com.addstar.slackapi.Channel;
-import au.com.addstar.slackapi.Group;
+import au.com.addstar.slackapi.GroupChannel;
 import au.com.addstar.slackapi.MessageOptions;
+import au.com.addstar.slackapi.NormalChannel;
+import au.com.addstar.slackapi.ObjectID;
 import au.com.addstar.slackapi.User;
 import au.com.addstar.slackapi.Message.MessageType;
 import au.com.addstar.slackapi.MessageOptions.ParseMode;
@@ -252,7 +253,7 @@ public class BouncerPlugin extends Plugin
 	{
 		for (BouncerChannel bChannel : channels)
 		{
-			Channel slackChannel = bouncer.getSession().getChannel(bChannel.getName());
+			NormalChannel slackChannel = bouncer.getSession().getChannel(bChannel.getName());
 			
 			if (slackChannel == null)
 			{
@@ -263,7 +264,7 @@ public class BouncerPlugin extends Plugin
 			// Check that the client is in the channel (join if not)
 			if (!slackChannel.isClientMember())
 			{
-				if (slackChannel instanceof Group)
+				if (slackChannel instanceof GroupChannel)
 					getLogger().severe("Not a member of group " + bChannel.getName() + ". Must be invited into group");
 				else
 				{
@@ -319,7 +320,7 @@ public class BouncerPlugin extends Plugin
 		}
 	}
 	
-	private void processCommands(User source, String channel, String text)
+	private void processCommands(User source, ObjectID channel, String text)
 	{
 		SlackCommandSender sender = new SlackCommandSender(this, bouncer, source, bouncer.getSession().getChannelById(channel));
 		

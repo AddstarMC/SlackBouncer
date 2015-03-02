@@ -10,7 +10,7 @@ import net.md_5.bungee.api.plugin.Listener;
 
 import com.google.common.collect.Lists;
 
-import au.com.addstar.slackapi.Channel;
+import au.com.addstar.slackapi.BaseChannel;
 import au.com.addstar.slackapi.MessageOptions;
 import au.com.addstar.slackapi.User;
 import au.com.addstar.slackapi.Message.MessageType;
@@ -23,7 +23,7 @@ public class BouncerChannel
 {
 	private final String name;
 	private final BouncerPlugin plugin;
-	private Channel slackChannel;
+	private BaseChannel slackChannel;
 	
 	private List<ISlackIncomingBouncer> incoming;
 	private List<ISlackOutgoingBouncer> outgoing;
@@ -51,7 +51,7 @@ public class BouncerChannel
 		return plugin;
 	}
 	
-	public Channel getSlackChannel()
+	public BaseChannel getSlackChannel()
 	{
 		return slackChannel;
 	}
@@ -105,7 +105,7 @@ public class BouncerChannel
 		}
 	}
 	
-	void link(Channel channel)
+	void link(BaseChannel channel)
 	{
 		slackChannel = channel;
 	}
