@@ -302,6 +302,9 @@ public class BouncerPlugin extends Plugin
 		if (event.getUser() == bouncer.getSession().getSelf())
 			return;
 		
+		if (event.getMessage().getText() == null)
+			return;
+		
 		String message = SlackUtils.resolveGroups(event.getMessage().getText(), bouncer.getSession());
 		BaseChannel source = bouncer.getSession().getChannelById(event.getMessage().getSourceId());
 		
