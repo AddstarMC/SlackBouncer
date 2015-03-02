@@ -337,7 +337,8 @@ public class BouncerPlugin extends Plugin
 			return;
 		
 		String user = bouncer.getSession().getSelf().getName().toLowerCase();
-		if (arguments[0].equalsIgnoreCase(user) || arguments[0].equalsIgnoreCase("@" + user))
+		
+		if (arguments[0].toLowerCase().startsWith(user) || arguments[0].toLowerCase().startsWith("@" + user))
 			start = 1;
 		else
 			start = 0;
