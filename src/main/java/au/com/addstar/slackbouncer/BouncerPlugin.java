@@ -81,6 +81,8 @@ public class BouncerPlugin extends Plugin
 		if (!loadConfig())
 			return;
 		
+		getProxy().getPluginManager().registerCommand(this, new BouncerCommand(this));
+		
 		if (!tryStartBouncer())
 			return;
 	}
@@ -323,6 +325,9 @@ public class BouncerPlugin extends Plugin
 		// Process bouncers
 		for (BouncerChannel channel : channels)
 		{
+			if (channel.getSlackChannel() == null)
+				continue;
+			
 			if (channel.getSlackChannel().getId().equals(event.getMessage().getSourceId()))
 				channel.onMessage(message, event.getUser(), event.getType());
 		}

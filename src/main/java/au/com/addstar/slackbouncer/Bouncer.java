@@ -1,9 +1,11 @@
 package au.com.addstar.slackbouncer;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.concurrent.TimeUnit;
 
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
 import au.com.addstar.slackapi.RealTimeListener;
 import au.com.addstar.slackapi.RealTimeSession;
 import au.com.addstar.slackapi.SlackAPI;
@@ -18,6 +20,8 @@ public class Bouncer implements RealTimeListener
 	private SlackAPI slack;
 	private RealTimeSession session;
 	private boolean isClosing;
+	private boolean isConnecting;
+	private ScheduledTask checkTask;
 	
 	public Bouncer(BouncerPlugin plugin)
 	{
@@ -25,6 +29,7 @@ public class Bouncer implements RealTimeListener
 		
 		slack = new SlackAPI(plugin.getConfig().token);
 		connect();
+		startReconnectionTask();
 	}
 	
 	public SlackAPI getSlack()
@@ -45,16 +50,40 @@ public class Bouncer implements RealTimeListener
 			session.close();
 			session = null;
 		}
+		
+		if (checkTask != null)
+		{
+			checkTask.cancel();
+			checkTask = null;
+		}
+	}
+	
+	private void startReconnectionTask()
+	{
+		checkTask = plugin.getProxy().getScheduler().schedule(plugin, new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				if (!isConnecting && session == null)
+					connect();
+			}
+		}, 10, 10, TimeUnit.SECONDS);
 	}
 	
 	private void connect()
 	{
+		if (session != null || isConnecting)
+			return;
+		
 		isClosing = false;
+		isConnecting = true;
 		ProxyServer.getInstance().getScheduler().runAsync(plugin, new Runnable()
 		{
 			@Override
 			public void run()
 			{
+				isConnecting = false;
 				try
 				{
 					session = slack.startRTSession();
@@ -63,11 +92,29 @@ public class Bouncer implements RealTimeListener
 				catch ( SlackException e )
 				{
 					plugin.getLogger().severe("Unable to connect to Slack service: " + e.toString());
+					session = null;
+				}
+				catch (SocketTimeoutException e)
+				{
+					plugin.getLogger().severe("Unable to connect to Slack service: Connection Timeout");
+					session = null;
+					
+					// Retry in a few seconds
+					ProxyServer.getInstance().getScheduler().schedule(plugin, new Runnable()
+					{
+						@Override
+						public void run()
+						{
+							if (!isClosing)
+								connect();
+						}
+					}, 5, TimeUnit.SECONDS);
 				}
 				catch ( IOException e )
 				{
 					plugin.getLogger().severe("Unable to connect to Slack service:");
 					e.printStackTrace();
+					session = null;
 				}
 			}
 		});
