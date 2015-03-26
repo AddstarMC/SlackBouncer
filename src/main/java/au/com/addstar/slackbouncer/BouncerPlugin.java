@@ -301,7 +301,7 @@ public class BouncerPlugin extends Plugin
 	
 	void onMessage(MessageEvent event)
 	{
-		if (event.getUser() == bouncer.getSession().getSelf())
+		if (event.getUser().equals(bouncer.getSession().getSelf()))
 			return;
 		
 		if (event.getMessage().getText() == null)
