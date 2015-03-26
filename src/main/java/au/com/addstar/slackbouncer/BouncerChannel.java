@@ -58,6 +58,12 @@ public class BouncerChannel
 	
 	public void load(ChannelDefinition def)
 	{
+		for (ISlackOutgoingBouncer bouncer : outgoing)
+		{
+			if (bouncer instanceof Listener)
+				plugin.getProxy().getPluginManager().unregisterListener((Listener)bouncer);
+		}
+		
 		incoming.clear();
 		outgoing.clear();
 		
