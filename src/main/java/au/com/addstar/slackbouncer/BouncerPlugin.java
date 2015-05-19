@@ -301,6 +301,25 @@ public class BouncerPlugin extends Plugin
 	
 	void onMessage(MessageEvent event)
 	{
+		// DEBUGGING: Trying to find out what was null in that same user check
+		if (event.getUser() == null)
+		{
+			getLogger().info("[DEBUG] Event user was null");
+			return;
+		}
+		
+		if (bouncer == null)
+		{
+			getLogger().info("[DEBUG] bouncer was null");
+			return;
+		}
+		
+		if (bouncer.getSession() == null)
+		{
+			getLogger().info("[DEBUG] session was null");
+			return;
+		}
+		
 		if (event.getUser().equals(bouncer.getSession().getSelf()))
 			return;
 		
