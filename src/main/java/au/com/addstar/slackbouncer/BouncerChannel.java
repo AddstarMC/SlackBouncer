@@ -147,6 +147,9 @@ public class BouncerChannel
 		{
 			plugin.getLogger().severe("Slack refused the message with: " + e.getMessage());
 		}
+		catch (NullPointerException e){
+			plugin.getLogger().severe("The slack channel you tried to message was null" + e.getMessage());
+		}
 	}
 	
 	public void sendMessage(String message, User target, MessageOptions options)

@@ -2,9 +2,43 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>au.com.addstar</groupId>
   <artifactId>SlackBouncer</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1-SNAPSHOT</version>
   <name>SlackBouncer</name>
-  
+    <properties>
+        <build.number />
+        <plugin.version>${project.version}-${build.number}</plugin.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <scm>
+        <connection>scm:git:git@github.com:AddstarMC/SlackBouncer.git</connection>
+        <developerConnection>scm:git:git@github.com:AddstarMC/SlackBouncer.git</developerConnection>
+        <url>https://github.com/AddstarMC/SlackBouncer</url>
+        <tag>HEAD</tag>
+    </scm>
+    <developers>
+        <developer>
+            <id>AddstarMC</id>
+            <name>AddstarMC</name>
+            <url>http://github.com/AddstarMC</url>
+            <roles>
+                <role>developer</role>
+                <role>maintainer</role>
+            </roles>
+            <timezone>10</timezone>
+        </developer>
+    </developers>
+    <distributionManagement>
+        <repository>
+            <id>maven.addstar.com.au</id>
+            <name>maven.addstar.com.au-releases</name>
+            <url>http://maven.addstar.com.au/artifactory/ext-release-local</url>
+        </repository>
+        <snapshotRepository>
+            <id>maven.addstar.com.au</id>
+            <name>maven.addstar.com.au-snapshots</name>
+            <url>http://maven.addstar.com.au/artifactory/ext-snapshot-local</url>
+        </snapshotRepository>
+    </distributionManagement>
   <repositories>
     <!-- Addstar repos -->
     <repository>
@@ -34,9 +68,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>net.md-5</groupId>
+      <groupId>au.com.addstar</groupId>
       <artifactId>bungeecord-api</artifactId>
-      <version>1.8-tab-SNAPSHOT</version>
+      <version>1.12-SNAPSHOT</version>
       <scope>provided</scope>
       <optional>true</optional>
   	</dependency>
@@ -50,7 +84,7 @@
   	<dependency>
   		<groupId>au.com.addstar</groupId>
   		<artifactId>BungeeChat-Proxy</artifactId>
-  		<version>1.0.1-SNAPSHOT</version>
+  		<version>1.1.0-SNAPSHOT</version>
   		<scope>provided</scope>
   	</dependency>
   	<dependency>
@@ -63,13 +97,23 @@
   	<dependency>
   		<groupId>net.cubespace</groupId>
   		<artifactId>geSuit</artifactId>
-  		<version>0.8.0</version>
+  		<version>0.9.1-SNAPSHOT</version>
   		<scope>provided</scope>
   	</dependency>
   </dependencies>
   
   <build>
   	<finalName>${project.name}</finalName>
+      <resources>
+          <resource>
+              <targetPath>.</targetPath>
+              <filtering>true</filtering>
+              <directory>${basedir}/src/resources/.</directory>
+              <includes>
+                  <include>*.yml</include>
+              </includes>
+          </resource>
+      </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -96,6 +140,11 @@
           <minimizeJar>true</minimizeJar>
         </configuration>
       </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-release-plugin</artifactId>
+            <version>2.5.1</version>
+        </plugin>
     </plugins>
   </build>
 </project>
