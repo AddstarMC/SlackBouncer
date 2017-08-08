@@ -185,4 +185,9 @@ public class SlackCommandSender implements CommandSender
 			plugin.getLogger().severe("Slack refused the message with: " + e.getMessage());
 		}
 	}
+
+	public boolean isSlackAdmin(){
+		return user.isAdmin();
+	}
+
 }

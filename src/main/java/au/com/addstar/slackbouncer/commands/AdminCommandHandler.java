@@ -1,5 +1,11 @@
 package au.com.addstar.slackbouncer.commands;
 
+import au.com.addstar.slackapi.MessageOptions;
+import au.com.addstar.slackbouncer.Bouncer;
+import au.com.addstar.slackbouncer.BouncerPlugin;
+import au.com.addstar.slackbouncer.bouncers.AdminBouncer;
+import net.cubespace.geSuit.managers.AdminCommandManager;
+
 /**
  * Created for use for the Add5tar MC Minecraft server
  * Created by benjamincharlton on 8/08/2017.
@@ -12,6 +18,9 @@ public class AdminCommandHandler implements ISlackCommandHandler {
 
     @Override
     public void onCommand(SlackCommandSender sender, String command, String[] args) throws IllegalStateException, IllegalArgumentException {
+        if (!sender.isSlackAdmin()){
+            sender.sendMessage("You cannot use this slack command as you are NOT a Slack Admin.",MessageOptions.DEFAULT);
+        }
         switch (command) {
             case "restart":
                 onAdminRestart(sender,args);
@@ -19,11 +28,14 @@ public class AdminCommandHandler implements ISlackCommandHandler {
         }
     }
 
-    private void onAdminRestart(SlackCommandSender sender, String[] args){
-        if(args.length != 2){
-            sender.sendMessage("Usage: restart <servername> <time> (e.g. 2h3m5s");
+    private void onAdminRestart(SlackCommandSender sender, String[] args) {
+        if (args.length != 2) {
+            sender.sendMessage("Usage: restart <servername> <time> (e.g. 2h3m5s", MessageOptions.DEFAULT);
             return;
         }
-
+        String server = args[0];
+        String time = args[1];
+        AdminCommandManager.sendAdminCommand(sender, server, "restart", time);
+        sender.sendMessage("Administrative Restart was sent to " + server + " to execute in "+time, MessageOptions.DEFAULT );
     }
 }

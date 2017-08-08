@@ -1,0 +1,25 @@
+#Example Configurations
+#-----------------------
+#Uncomment below and paste your Slack application token
+#token: '*unspecified*'
+#-----------------------
+#Start Channel Configurations
+#channels:
+#  '#warns-bans':
+#    incoming: {}
+#    outgoing:
+#      gesuit:
+#        bans: true
+#        warns: true
+#        unbans: true
+#  admin-chat:
+#    outgoing:
+#      bungeechat:
+#        channel: AdminChat
+#        cached: true
+#        cacheSize: 20
+#      admin:
+#        channel: AdminChat
+#        allowRestarts: false
+#    incoming: {}
+#

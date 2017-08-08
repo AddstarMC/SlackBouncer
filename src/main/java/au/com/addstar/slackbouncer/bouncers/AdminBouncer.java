@@ -18,6 +18,6 @@ public class AdminBouncer implements ISlackOutgoingBouncer {
 
     @Override
     public void load(ConfigSection section) {
-        restarts = section.has("AllowRestarts") && section.<Boolean>get("AllowRestarts");
+        restarts = section.has("allowRestarts") && section.<Boolean>get("allowRestarts");
     }
 }

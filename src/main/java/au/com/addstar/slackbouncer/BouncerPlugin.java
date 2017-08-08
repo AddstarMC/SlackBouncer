@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import au.com.addstar.slackbouncer.commands.*;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -33,10 +34,6 @@ import au.com.addstar.slackbouncer.bouncers.BungeeChatBouncer;
 import au.com.addstar.slackbouncer.bouncers.GeSuitBouncer;
 import au.com.addstar.slackbouncer.bouncers.ISlackIncomingBouncer;
 import au.com.addstar.slackbouncer.bouncers.ISlackOutgoingBouncer;
-import au.com.addstar.slackbouncer.commands.GeSuitCommandHandler;
-import au.com.addstar.slackbouncer.commands.ISlackCommandHandler;
-import au.com.addstar.slackbouncer.commands.ProxyCommandHandler;
-import au.com.addstar.slackbouncer.commands.SlackCommandSender;
 import au.com.addstar.slackbouncer.config.ChannelDefinition;
 import au.com.addstar.slackbouncer.config.MainConfig;
 
@@ -74,6 +71,7 @@ public class BouncerPlugin extends Plugin
 		{
 			registerOutgoingBouncer("gesuit", GeSuitBouncer.class);
 			registerCommandHandler(new GeSuitCommandHandler(), "seen", "where", "names", "warnhistory", "banhistory", "geo");
+			registerCommandHandler(new AdminCommandHandler(), "restart");
 		}
 		
 		registerCommandHandler(new ProxyCommandHandler(), "who", "list");

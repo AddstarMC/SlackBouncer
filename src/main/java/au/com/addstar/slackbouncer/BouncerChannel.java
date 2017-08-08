@@ -56,7 +56,7 @@ public class BouncerChannel
 		return slackChannel;
 	}
 	
-	public void load(ChannelDefinition def)
+	public void load( ChannelDefinition def)
 	{
 		for (ISlackOutgoingBouncer bouncer : outgoing)
 		{

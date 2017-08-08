@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.common.base.Strings;
+import com.google.common.cache.Cache;
 import com.google.common.collect.Maps;
 
 import au.com.addstar.bc.BungeeChat;
@@ -28,7 +29,9 @@ import net.md_5.bungee.event.EventHandler;
 public class BungeeChatBouncer implements ISlackIncomingBouncer, ISlackOutgoingBouncer, Listener
 {
 	private Map<String, ChatChannel> mChannels;
-	
+	private Cache<Integer, String> messageCache;
+	private boolean cached;
+	private int cacheSize =20;
 	private BouncerChannel mChannel;
 	
 	public BungeeChatBouncer()
@@ -63,6 +66,10 @@ public class BungeeChatBouncer implements ISlackIncomingBouncer, ISlackOutgoingB
 				if (channel != null)
 					mChannels.put(name, channel);
 			}
+		}
+		cached = section.has("cached") && section.<Boolean>get("cached");
+		if(cached){
+			cacheSize = (section.has("cacheSize"))?section.<Integer>get("cachedSize"):20;
 		}
 	}
 	
