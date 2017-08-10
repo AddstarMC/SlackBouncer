@@ -51,12 +51,17 @@ public class SlackUtils
 			}
 			else if (arg.startsWith("!"))
 			{
-				if (arg.equals("!everyone"))
-					m.appendReplacement(buffer, "@everyone");
-				else if (arg.equals("!channel"))
-					m.appendReplacement(buffer, "@channel");
-				else if (arg.equals("!group"))
-					m.appendReplacement(buffer, "@group");
+				switch (arg) {
+					case "!everyone":
+						m.appendReplacement(buffer, "@everyone");
+						break;
+					case "!channel":
+						m.appendReplacement(buffer, "@channel");
+						break;
+					case "!group":
+						m.appendReplacement(buffer, "@group");
+						break;
+				}
 			}
 			else
 			{

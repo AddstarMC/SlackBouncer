@@ -23,7 +23,7 @@ public class Bouncer implements RealTimeListener
 	private boolean isConnecting;
 	private ScheduledTask checkTask;
 	
-	private Object lockObject = new Object();
+	private final Object lockObject = new Object();
 	
 	public Bouncer(BouncerPlugin plugin)
 	{

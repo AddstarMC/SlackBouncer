@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map.Entry;
 
+import au.com.addstar.slackbouncer.commands.ISlackCommandHandler;
 import net.cubespace.Yamler.Config.ConfigSection;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.api.plugin.Listener;
@@ -56,60 +57,52 @@ public class BouncerChannel
 		return slackChannel;
 	}
 	
-	public void load( ChannelDefinition def)
-	{
-		for (ISlackOutgoingBouncer bouncer : outgoing)
-		{
-			if (bouncer instanceof Listener)
-				plugin.getProxy().getPluginManager().unregisterListener((Listener)bouncer);
-		}
-		
-		incoming.clear();
-		outgoing.clear();
-		
-		if (def.incoming != null)
-		{
-			for (Entry<String, ConfigSection> entry : def.incoming.entrySet())
-			{
-				ISlackIncomingBouncer bouncer = plugin.makeIncomingBouncer(entry.getKey());
-				if (bouncer == null)
-					plugin.getLogger().warning("Unknown incoming bouncer definition " + entry.getKey() + " in channel " + name);
-				
-				try
-				{
-					bouncer.load(entry.getValue());
-					incoming.add(bouncer);
-				}
-				catch (InvalidConfigurationException e)
-				{
-					plugin.getLogger().severe("Unable to load incoming bouncer " + entry.getKey() + " in channel " + name + ": " + e.getMessage());
-				}
-			}
-		}
-		
-		if (def.outgoing != null)
-		{
-			for (Entry<String, ConfigSection> entry : def.outgoing.entrySet())
-			{
-				ISlackOutgoingBouncer bouncer = plugin.makeOutgoingBouncer(entry.getKey(), this);
-				if (bouncer == null)
-					plugin.getLogger().warning("Unknown outgoing bouncer definition " + entry.getKey() + " in channel " + name);
-				
-				try
-				{
-					bouncer.load(entry.getValue());
-					if (bouncer instanceof Listener)
-						plugin.getProxy().getPluginManager().registerListener(plugin, (Listener)bouncer);
-					
-					outgoing.add(bouncer);
-				}
-				catch (InvalidConfigurationException e)
-				{
-					plugin.getLogger().severe("Unable to load outgoing bouncer " + entry.getKey() + " in channel " + name + ": " + e.getMessage());
-				}
-			}
-		}
-	}
+	public void load( ChannelDefinition def) {
+        for (ISlackOutgoingBouncer bouncer : outgoing) {
+            if (bouncer instanceof Listener)
+                plugin.getProxy().getPluginManager().unregisterListener((Listener) bouncer);
+        }
+
+        incoming.clear();
+        outgoing.clear();
+
+        if (def.incoming != null) {
+            for (Entry<String, ConfigSection> entry : def.incoming.entrySet()) {
+                ISlackIncomingBouncer bouncer = plugin.makeIncomingBouncer(entry.getKey());
+                if (bouncer == null) {
+                    plugin.getLogger().warning("Unknown incoming bouncer definition " + entry.getKey() + " in channel " + name);
+                }
+                try {
+                    bouncer.load(entry.getValue());
+                    incoming.add(bouncer);
+                } catch (InvalidConfigurationException e) {
+                    plugin.getLogger().severe("Unable to load incoming bouncer " + entry.getKey() + " in channel " + name + ": " + e.getMessage());
+                }
+
+            }
+
+            if (def.outgoing != null) {
+                for (Entry<String, ConfigSection> entry : def.outgoing.entrySet()) {
+                    ISlackOutgoingBouncer bouncer = plugin.makeOutgoingBouncer(entry.getKey(), this);
+                    if(bouncer instanceof ISlackCommandHandler){
+                      plugin.registerCommandHandler((ISlackCommandHandler)bouncer,"cache_"+name);
+                    }
+                    if (bouncer == null)
+                        plugin.getLogger().warning("Unknown outgoing bouncer definition " + entry.getKey() + " in channel " + name);
+
+                    try {
+                        bouncer.load(entry.getValue());
+                        if (bouncer instanceof Listener)
+                            plugin.getProxy().getPluginManager().registerListener(plugin, (Listener) bouncer);
+
+                        outgoing.add(bouncer);
+                    } catch (InvalidConfigurationException e) {
+                        plugin.getLogger().severe("Unable to load outgoing bouncer " + entry.getKey() + " in channel " + name + ": " + e.getMessage());
+                    }
+                }
+            }
+        }
+    }
 	
 	void link(BaseChannel channel)
 	{

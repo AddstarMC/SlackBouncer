@@ -1,9 +1,6 @@
 package au.com.addstar.slackbouncer.commands;
 
 import au.com.addstar.slackapi.MessageOptions;
-import au.com.addstar.slackbouncer.Bouncer;
-import au.com.addstar.slackbouncer.BouncerPlugin;
-import au.com.addstar.slackbouncer.bouncers.AdminBouncer;
 import net.cubespace.geSuit.managers.AdminCommandManager;
 
 /**

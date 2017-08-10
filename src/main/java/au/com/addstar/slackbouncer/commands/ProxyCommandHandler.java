@@ -42,8 +42,8 @@ public class ProxyCommandHandler implements ISlackCommandHandler
 		Collection<ProxiedPlayer> players = ProxyServer.getInstance().getPlayers();
 		Attachment attachment = new Attachment(players.size() + " players online");
 		attachment.setTitle(players.size() + " players online");
-		attachment.setFormatFields(false);;
-		
+		attachment.setFormatFields(false);
+
 		ListMultimap<String, String> groups = ArrayListMultimap.create();
 		for (ProxiedPlayer player : players)
 		{

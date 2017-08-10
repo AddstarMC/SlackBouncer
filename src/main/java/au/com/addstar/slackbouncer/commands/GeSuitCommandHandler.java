@@ -102,7 +102,7 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 		String search = args[0];
 		Attachment attachment = new Attachment("/where results");
 		
-		List<Track> tracking = null;
+		List<Track> tracking;
 		if ( search.contains(".") )
 		{
 			tracking = DatabaseManager.tracking.getPlayerTracking(search, "ip");

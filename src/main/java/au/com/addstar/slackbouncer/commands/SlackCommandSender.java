@@ -104,8 +104,7 @@ public class SlackCommandSender implements CommandSender
 	{
 		synchronized(messages)
 		{
-			for (String line : message)
-				messages.add(line);
+			Collections.addAll(messages, message);
 			
 			startSendDelay();
 		}
@@ -170,20 +169,7 @@ public class SlackCommandSender implements CommandSender
 		}
 		
 		String combined = Joiner.on('\n').join(message);
-		
-		try
-		{
-			bouncer.getSlack().sendMessage(SlackUtils.toSlack(combined), channel, options);
-		}
-		catch (IOException e)
-		{
-			plugin.getLogger().severe("An IOException occurred while sending a message:");
-			e.printStackTrace();
-		}
-		catch (SlackException e)
-		{
-			plugin.getLogger().severe("Slack refused the message with: " + e.getMessage());
-		}
+		sendMessage(combined,options);
 	}
 
 	public boolean isSlackAdmin(){

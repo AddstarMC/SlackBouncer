@@ -4,10 +4,10 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import net.cubespace.Yamler.Config.Config;
 import net.cubespace.Yamler.Config.ConfigSection;
+import net.cubespace.Yamler.Config.YamlConfig;
 
-public class ChannelDefinition extends Config
+public class ChannelDefinition extends YamlConfig
 {
 	public ChannelDefinition()
 	{

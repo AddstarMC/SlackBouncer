@@ -7,9 +7,9 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import net.cubespace.Yamler.Config.Config;
+import net.cubespace.Yamler.Config.YamlConfig;
 
-public class MainConfig extends Config
+public class MainConfig extends YamlConfig
 {
 	public MainConfig(File file)
 	{

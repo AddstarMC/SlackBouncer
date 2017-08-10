@@ -81,8 +81,7 @@ public class BouncerPlugin extends Plugin
 		
 		getProxy().getPluginManager().registerCommand(this, new BouncerCommand(this));
 		
-		if (!tryStartBouncer())
-			return;
+		tryStartBouncer();
 	}
 	
 	@Override
@@ -134,21 +133,14 @@ public class BouncerPlugin extends Plugin
 		}
 	}
 	
-	public boolean reloadConfig()
-	{
-		if (bouncer != null)
-		{
+	public boolean reloadConfig() {
+		if (bouncer != null) {
 			bouncer.shutdown();
 			bouncer = null;
 		}
-		
-		if (!loadConfig())
-			return false;
-		
-		if (!tryStartBouncer())
-			return false;
-		
-		return true;
+
+		return loadConfig() && tryStartBouncer();
+
 	}
 	
 	public void registerIncomingBouncer(String name, Class<? extends ISlackIncomingBouncer> bouncerClass)
@@ -193,26 +185,15 @@ public class BouncerPlugin extends Plugin
 		Constructor<? extends ISlackIncomingBouncer> constructor = incomingRegistrations.get(name.toLowerCase());
 		if (constructor == null)
 			return null;
-		
 		try
 		{
 			return constructor.newInstance();
 		}
-		catch (IllegalArgumentException e)
+		catch (IllegalArgumentException | IllegalAccessException e)
 		{
 			// Should never happen
 			throw new AssertionError(e);
-		}
-		catch (IllegalAccessException e)
-		{
-			// Should never happen
-			throw new AssertionError(e);
-		}
-		catch (InstantiationException e)
-		{
-			throw new RuntimeException(e);
-		}
-		catch ( InvocationTargetException e )
+		} catch (InstantiationException | InvocationTargetException e)
 		{
 			throw new RuntimeException(e);
 		}
@@ -228,21 +209,11 @@ public class BouncerPlugin extends Plugin
 		{
 			return constructor.newInstance(channel);
 		}
-		catch (IllegalArgumentException e)
+		catch (IllegalArgumentException | IllegalAccessException e)
 		{
 			// Should never happen
 			throw new AssertionError(e);
-		}
-		catch (IllegalAccessException e)
-		{
-			// Should never happen
-			throw new AssertionError(e);
-		}
-		catch (InstantiationException e)
-		{
-			throw new RuntimeException(e);
-		}
-		catch ( InvocationTargetException e )
+		} catch (InstantiationException | InvocationTargetException e)
 		{
 			throw new RuntimeException(e);
 		}
@@ -352,7 +323,7 @@ public class BouncerPlugin extends Plugin
 	
 	private void processCommands(User source, BaseChannel channel, String text)
 	{
-		int start = 0;
+		int start;
 		
 		SlackCommandSender sender = new SlackCommandSender(this, bouncer, source, channel);
 		

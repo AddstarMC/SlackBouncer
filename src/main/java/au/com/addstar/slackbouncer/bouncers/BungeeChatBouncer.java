@@ -1,13 +1,17 @@
 package au.com.addstar.slackbouncer.bouncers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import au.com.addstar.slackapi.MessageOptions;
+import au.com.addstar.slackbouncer.commands.ISlackCommandHandler;
+import au.com.addstar.slackbouncer.commands.SlackCommandSender;
 import com.google.common.base.Strings;
-import com.google.common.cache.Cache;
 import com.google.common.collect.Maps;
 
 import au.com.addstar.bc.BungeeChat;
@@ -18,6 +22,7 @@ import au.com.addstar.slackapi.Message.MessageType;
 import au.com.addstar.slackapi.User;
 import au.com.addstar.slackbouncer.BouncerChannel;
 import au.com.addstar.slackbouncer.SlackUtils;
+import com.google.common.collect.Queues;
 import net.cubespace.Yamler.Config.ConfigSection;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.api.ChatColor;
@@ -26,17 +31,18 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
-public class BungeeChatBouncer implements ISlackIncomingBouncer, ISlackOutgoingBouncer, Listener
+public class BungeeChatBouncer implements ISlackIncomingBouncer, ISlackOutgoingBouncer, Listener, ISlackCommandHandler
 {
 	private Map<String, ChatChannel> mChannels;
-	private Cache<Integer, String> messageCache;
-	private boolean cached;
-	private int cacheSize =20;
+	private LinkedBlockingQueue<String> messageCache;
+	private Boolean cached;
+	private Integer cacheSize =20;
 	private BouncerChannel mChannel;
 	
 	public BungeeChatBouncer()
 	{
 		mChannels = Maps.newHashMap();
+		messageCache = Queues.newLinkedBlockingQueue(cacheSize);
 	}
 	
 	public BungeeChatBouncer(BouncerChannel channel)
@@ -70,6 +76,10 @@ public class BungeeChatBouncer implements ISlackIncomingBouncer, ISlackOutgoingB
 		cached = section.has("cached") && section.<Boolean>get("cached");
 		if(cached){
 			cacheSize = (section.has("cacheSize"))?section.<Integer>get("cachedSize"):20;
+            messageCache = Queues.newLinkedBlockingQueue(cacheSize);
+        }else{
+			cacheSize = 0;
+			messageCache = null;
 		}
 	}
 	
@@ -173,8 +183,30 @@ public class BungeeChatBouncer implements ISlackIncomingBouncer, ISlackOutgoingB
 				finalMessage = event.getMessage();
 			else
 				finalMessage = reformatMessage(chatChannel.format, event.getMessage());
-			
-			mChannel.sendMessage(finalMessage);
+			if(!cached){
+			    mChannel.sendMessage(finalMessage);
+			}else{
+			    messageCache.offer(finalMessage);
+            }
 		}
 	}
+
+    @Override
+    public String getUsage(String command) {
+        return "check_<channel_name>";
+    }
+
+    @Override
+    public void onCommand(SlackCommandSender sender, String command, String[] args) throws IllegalStateException, IllegalArgumentException {
+	    List<String> out = new ArrayList<>();
+	    int size = messageCache.size();
+	    out.add("Last " + size + " Messages on this monitor");
+        for(String message: messageCache){
+            out.add(message);
+            messageCache.remove(message);
+        }
+        String[] mess= new String[out.size()];
+        out.toArray(mess);
+        sender.sendMessage(mess, MessageOptions.DEFAULT);
+    }
 }

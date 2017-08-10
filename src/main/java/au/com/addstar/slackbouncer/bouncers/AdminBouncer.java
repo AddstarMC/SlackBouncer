@@ -2,7 +2,6 @@ package au.com.addstar.slackbouncer.bouncers;
 
 import au.com.addstar.slackbouncer.BouncerChannel;
 import net.cubespace.Yamler.Config.ConfigSection;
-import net.cubespace.Yamler.Config.InvalidConfigurationException;
 
 /**
  * Created for use for the Add5tar MC Minecraft server
