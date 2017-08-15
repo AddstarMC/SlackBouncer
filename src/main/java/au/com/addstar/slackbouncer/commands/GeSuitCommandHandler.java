@@ -395,6 +395,7 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 			BansManager.banIP(sender.getName(), ip, reason);
 		} else {
 			BansManager.banPlayer(sender.getName(),args[0],reason);
+
 		}
 	}
     private void onUnBan(SlackCommandSender sender, String[] args) {
