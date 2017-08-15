@@ -1,34 +1,25 @@
 package au.com.addstar.slackbouncer.commands;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import au.com.addstar.slackapi.Attachment;
 import au.com.addstar.slackapi.Attachment.AttachmentField;
 import au.com.addstar.slackapi.MessageOptions;
 import au.com.addstar.slackapi.MessageOptions.ParseMode;
-
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-
 import net.cubespace.geSuit.Utilities;
 import net.cubespace.geSuit.geSuit;
-import net.cubespace.geSuit.managers.ConfigManager;
-import net.cubespace.geSuit.managers.DatabaseManager;
-import net.cubespace.geSuit.managers.GeoIPManager;
-import net.cubespace.geSuit.managers.PlayerManager;
+import net.cubespace.geSuit.managers.*;
 import net.cubespace.geSuit.objects.Ban;
 import net.cubespace.geSuit.objects.GSPlayer;
 import net.cubespace.geSuit.objects.Track;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class GeSuitCommandHandler implements ISlackCommandHandler
 {
@@ -57,27 +48,31 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 	@Override
 	public void onCommand( SlackCommandSender sender, String command, String[] args ) throws IllegalStateException, IllegalArgumentException
 	{
-		switch (command)
-		{
-		case "seen":
-			onSeen(sender, args);
-			break;
-		case "where":
-			onWhere(sender, args);
-			break;
-		case "names":
-			onNames(sender, args);
-			break;
-		case "warnhistory":
-			onWarnHistory(sender, args);
-			break;
-		case "banhistory":
-			onBanHistory(sender, args);
-			break;
-		case "geo":
-			onGeoLookup(sender, args);
-			break;
-		}
+		switch (command) {
+            case "seen":
+                onSeen(sender, args);
+                break;
+            case "where":
+                onWhere(sender, args);
+                break;
+            case "names":
+                onNames(sender, args);
+                break;
+            case "warnhistory":
+                onWarnHistory(sender, args);
+                break;
+            case "banhistory":
+                onBanHistory(sender, args);
+                break;
+            case "geo":
+                onGeoLookup(sender, args);
+                break;
+
+            case "ban":
+                onBan(sender, args);
+            case "unban":
+                onUnBan(sender, args);
+        }
 	}
 	
 	public void onSeen(SlackCommandSender sender, String[] args)
@@ -377,6 +372,42 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 				.build()
 			);
 	}
+	private void onBan(SlackCommandSender sender, String[] args) {
+		if (args.length == 0) {
+			throw new IllegalStateException("ban <player|ip> <reason>");
+		}
+		String targetId;
+		String reason = "-Unknown-";
+		if (args.length > 1) {
+			StringBuilder builder = new StringBuilder();
+			for (int i = 1; i < args.length; ++i) {
+				if (i != 1) {
+					builder.append(' ');
+				}
+
+				builder.append(args[i]);
+			}
+
+			reason = builder.toString();
+		}
+		if (Utilities.isIPAddress(args[0])) {
+			String ip = args[0];
+			BansManager.banIP(sender.getName(), ip, reason);
+		} else {
+			BansManager.banPlayer(sender.getName(),args[0],reason);
+		}
+	}
+    private void onUnBan(SlackCommandSender sender, String[] args) {
+        if (args.length == 0) {
+            throw new IllegalStateException("unban <player>");
+        }
+        if (Utilities.isIPAddress(args[0])) {
+            //cannot unban Ip
+        } else {
+            BansManager.unbanPlayer(sender.getName(),args[0]);
+        }
+    }
+
 	
 	private void onGeoLookup(SlackCommandSender sender, String[] args)
 	{
