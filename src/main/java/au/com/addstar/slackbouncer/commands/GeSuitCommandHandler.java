@@ -376,7 +376,6 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 		if (args.length == 0) {
 			throw new IllegalStateException("ban <player|ip> <reason>");
 		}
-		String targetId;
 		String reason = "-Unknown-";
 		if (args.length > 1) {
 			StringBuilder builder = new StringBuilder();
@@ -392,9 +391,9 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 		}
 		if (Utilities.isIPAddress(args[0])) {
 			String ip = args[0];
-			BansManager.banIP(sender.getName(), ip, reason);
+			BansManager.banIP(sender, ip, reason);
 		} else {
-			BansManager.banPlayer(sender.getName(),args[0],reason);
+			BansManager.banPlayer(sender,args[0],reason,false);
 
 		}
 	}
@@ -405,7 +404,8 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
         if (Utilities.isIPAddress(args[0])) {
             //cannot unban Ip
         } else {
-            BansManager.unbanPlayer(sender.getName(),args[0]);
+            BansManager.unbanPlayer(sender,args[0]);
+
         }
     }
 

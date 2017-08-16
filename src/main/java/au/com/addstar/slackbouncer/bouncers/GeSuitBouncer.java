@@ -17,6 +17,8 @@ import net.md_5.bungee.event.EventHandler;
 
 public class GeSuitBouncer implements ISlackOutgoingBouncer, Listener
 {
+
+
 	private BouncerChannel mChannel;
 	
 	private boolean showBans;
