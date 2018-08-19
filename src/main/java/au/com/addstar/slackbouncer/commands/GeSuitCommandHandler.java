@@ -67,7 +67,6 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
             case "geo":
                 onGeoLookup(sender, args);
                 break;
-
             case "ban":
                 onBan(sender, args);
             case "unban":
