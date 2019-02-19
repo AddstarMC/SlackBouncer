@@ -10,7 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import au.com.addstar.slackbouncer.bouncers.*;
 import au.com.addstar.slackbouncer.commands.*;
+import au.com.addstar.slackbouncer.bouncers.MonitorBouncer;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -30,10 +32,6 @@ import au.com.addstar.slackapi.Message.MessageType;
 import au.com.addstar.slackapi.MessageOptions.ParseMode;
 import au.com.addstar.slackapi.events.MessageEvent;
 import au.com.addstar.slackapi.exceptions.SlackException;
-import au.com.addstar.slackbouncer.bouncers.BungeeChatBouncer;
-import au.com.addstar.slackbouncer.bouncers.GeSuitBouncer;
-import au.com.addstar.slackbouncer.bouncers.ISlackIncomingBouncer;
-import au.com.addstar.slackbouncer.bouncers.ISlackOutgoingBouncer;
 import au.com.addstar.slackbouncer.config.ChannelDefinition;
 import au.com.addstar.slackbouncer.config.MainConfig;
 
@@ -45,6 +43,7 @@ public class BouncerPlugin extends Plugin
 	
 	private MainConfig config;
 	private Bouncer bouncer;
+	private MonitorBouncer monitor;
 	
 	private List<BouncerChannel> channels;
 	
@@ -70,15 +69,14 @@ public class BouncerPlugin extends Plugin
 		if (getProxy().getPluginManager().getPlugin("geSuit") != null)
 		{
 			registerOutgoingBouncer("gesuit", GeSuitBouncer.class);
+			registerOutgoingBouncer("admin", AdminBouncer.class);
 			registerCommandHandler(new GeSuitCommandHandler(), "seen", "where", "names", "warnhistory", "banhistory", "geo");
 			registerCommandHandler(new AdminCommandHandler(), "restart");
 		}
-		
-		registerCommandHandler(new ProxyCommandHandler(), "who", "list");
-		
+		if(getProxy())
+		registerCommandHandler(new ProxyCommandHandler(this), "who", "list","watch");
 		if (!loadConfig())
 			return;
-		
 		getProxy().getPluginManager().registerCommand(this, new BouncerCommand(this));
 		
 		tryStartBouncer();
@@ -219,7 +217,7 @@ public class BouncerPlugin extends Plugin
 		}
 	}
 	
-	Bouncer getBouncer()
+	public Bouncer getBouncer()
 	{
 		return bouncer;
 	}

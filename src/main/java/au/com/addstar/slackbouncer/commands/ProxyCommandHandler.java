@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import au.com.addstar.slackbouncer.BouncerPlugin;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
@@ -19,6 +20,11 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class ProxyCommandHandler implements ISlackCommandHandler
 {
+	private BouncerPlugin plugin;
+	public ProxyCommandHandler(BouncerPlugin plugin) {
+		this.plugin = plugin;
+	}
+	
 	@Override
 	public String getUsage( String command )
 	{
@@ -34,6 +40,13 @@ public class ProxyCommandHandler implements ISlackCommandHandler
 		case "list":
 			onWho(sender);
 			break;
+		case "monitor":
+			if(args.length < 1) {
+			
+			}
+			String pName = args[0];
+			ProxiedPlayer player = ProxyServer.getInstance().getPlayer(pName);
+			
 		}
 	}
 	
