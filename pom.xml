@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>au.com.addstar</groupId>
   <artifactId>SlackBouncer</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2-SNAPSHOT</version>
   <name>SlackBouncer</name>
     <properties>
         <build.number />
@@ -13,7 +13,7 @@
         <connection>scm:git:git@github.com:AddstarMC/SlackBouncer.git</connection>
         <developerConnection>scm:git:git@github.com:AddstarMC/SlackBouncer.git</developerConnection>
         <url>https://github.com/AddstarMC/SlackBouncer</url>
-        <tag>SlackBouncer-1.0.1</tag>
+        <tag>HEAD</tag>
     </scm>
     <developers>
         <developer>
