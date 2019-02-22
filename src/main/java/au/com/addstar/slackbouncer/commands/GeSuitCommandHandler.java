@@ -1,7 +1,7 @@
 package au.com.addstar.slackbouncer.commands;
 
-import au.com.addstar.slackapi.Attachment;
-import au.com.addstar.slackapi.Attachment.AttachmentField;
+import au.com.addstar.slackapi.objects.Attachment;
+import au.com.addstar.slackapi.objects.Attachment.AttachmentField;
 import au.com.addstar.slackapi.MessageOptions;
 import au.com.addstar.slackapi.MessageOptions.ParseMode;
 import com.google.common.base.Joiner;

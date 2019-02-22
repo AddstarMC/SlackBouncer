@@ -3,11 +3,8 @@ package au.com.addstar.slackbouncer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import au.com.addstar.slackapi.BaseChannel;
-import au.com.addstar.slackapi.NormalChannel;
-import au.com.addstar.slackapi.ObjectID;
+import au.com.addstar.slackapi.objects.*;
 import au.com.addstar.slackapi.RealTimeSession;
-import au.com.addstar.slackapi.User;
 import net.md_5.bungee.api.ChatColor;
 
 public class SlackUtils
@@ -28,9 +25,9 @@ public class SlackUtils
 					m.appendReplacement(buffer, "#" + id.substring(id.indexOf("|")+1));
 				else
 				{
-					BaseChannel c = session.getChannelById(new ObjectID(id));
-					if (c != null && c instanceof NormalChannel)
-						m.appendReplacement(buffer, "#" + ((NormalChannel)c).getName());
+					Conversation c = session.getChannelById(new ObjectID(id));
+					if (c != null && c.isChannel() && c.isGeneral())
+						m.appendReplacement(buffer, "#" + c.getName());
 					else
 						m.appendReplacement(buffer, "#" + id);
 				}

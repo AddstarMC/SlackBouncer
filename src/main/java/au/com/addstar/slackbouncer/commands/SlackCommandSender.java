@@ -6,12 +6,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import au.com.addstar.slackapi.objects.Conversation;
+import au.com.addstar.slackapi.objects.IdBaseObject;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-import au.com.addstar.slackapi.BaseChannel;
 import au.com.addstar.slackapi.MessageOptions;
-import au.com.addstar.slackapi.User;
+import au.com.addstar.slackapi.objects.User;
 import au.com.addstar.slackapi.exceptions.SlackException;
 import au.com.addstar.slackbouncer.Bouncer;
 import au.com.addstar.slackbouncer.BouncerPlugin;
@@ -26,14 +27,14 @@ public class SlackCommandSender implements CommandSender
 	private BouncerPlugin plugin;
 	private Bouncer bouncer;
 	private User user;
-	private BaseChannel channel;
+	private Conversation channel;
 	
 	private boolean hasDoneTarget;
 	
 	private ScheduledTask sendTask;
 	private List<String> messages;
 	
-	public SlackCommandSender(BouncerPlugin plugin, Bouncer bouncer, User user, BaseChannel channel)
+	public SlackCommandSender(BouncerPlugin plugin, Bouncer bouncer, User user, Conversation channel)
 	{
 		this.plugin = plugin;
 		this.bouncer = bouncer;

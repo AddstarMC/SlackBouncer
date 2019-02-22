@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map.Entry;
 
+import au.com.addstar.slackapi.objects.Conversation;
 import au.com.addstar.slackbouncer.commands.ISlackCommandHandler;
 import net.cubespace.Yamler.Config.ConfigSection;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
@@ -11,10 +12,9 @@ import net.md_5.bungee.api.plugin.Listener;
 
 import com.google.common.collect.Lists;
 
-import au.com.addstar.slackapi.BaseChannel;
 import au.com.addstar.slackapi.MessageOptions;
-import au.com.addstar.slackapi.User;
-import au.com.addstar.slackapi.Message.MessageType;
+import au.com.addstar.slackapi.objects.User;
+import au.com.addstar.slackapi.objects.Message.MessageType;
 import au.com.addstar.slackapi.exceptions.SlackException;
 import au.com.addstar.slackbouncer.bouncers.ISlackIncomingBouncer;
 import au.com.addstar.slackbouncer.bouncers.ISlackOutgoingBouncer;
@@ -24,7 +24,7 @@ public class BouncerChannel
 {
 	private final String name;
 	private final BouncerPlugin plugin;
-	private BaseChannel slackChannel;
+	private Conversation slackChannel;
 	
 	private List<ISlackIncomingBouncer> incoming;
 	private List<ISlackOutgoingBouncer> outgoing;
@@ -52,7 +52,7 @@ public class BouncerChannel
 		return plugin;
 	}
 	
-	public BaseChannel getSlackChannel()
+	public Conversation getSlackChannel()
 	{
 		return slackChannel;
 	}
@@ -104,7 +104,7 @@ public class BouncerChannel
         }
     }
 	
-	void link(BaseChannel channel)
+	void link(Conversation channel)
 	{
 		slackChannel = channel;
 	}
