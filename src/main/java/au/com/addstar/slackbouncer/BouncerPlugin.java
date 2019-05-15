@@ -73,7 +73,6 @@ public class BouncerPlugin extends Plugin
 			registerCommandHandler(new GeSuitCommandHandler(), "seen", "where", "names", "warnhistory", "banhistory", "geo");
 			registerCommandHandler(new AdminCommandHandler(), "restart");
 		}
-		if(getProxy())
 		registerCommandHandler(new ProxyCommandHandler(this), "who", "list","watch");
 		if (!loadConfig())
 			return;
