@@ -1,7 +1,6 @@
 package au.com.addstar.slackbouncer.commands;
 
 import au.com.addstar.slackapi.objects.Message;
-import au.com.addstar.slackapi.objects.blocks.Block;
 import au.com.addstar.slackapi.objects.blocks.Section;
 import au.com.addstar.slackapi.objects.blocks.composition.TextObject;
 import au.com.addstar.slackbouncer.managers.SimpleTicketManager;
@@ -41,7 +40,7 @@ public class TicketCommandHandler implements ISlackCommandHandler {
 
     @Override
     public String getUsage(String command) {
-        return null;
+        return "tickets | reply <id> <response>";
     }
 
     @Override
@@ -50,9 +49,9 @@ public class TicketCommandHandler implements ISlackCommandHandler {
         {
             case "tickets":
                 listTickets(sender);
-            case "reply":
-                //onWho(sender);
                 break;
+            case "reply":
+                throw new IllegalArgumentException("Not yet Supported");
         }
     }
 

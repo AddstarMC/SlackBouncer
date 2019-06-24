@@ -59,7 +59,6 @@ public class BouncerPlugin extends Plugin
 	public void onEnable()
 	{
 		config = new MainConfig(new File(getDataFolder(), "config.yml"));
-		
 		if (getProxy().getPluginManager().getPlugin("BungeeChat") != null)
 		{
 			registerIncomingBouncer("bungeechat", BungeeChatBouncer.class);
@@ -73,6 +72,9 @@ public class BouncerPlugin extends Plugin
 			registerCommandHandler(new GeSuitCommandHandler(), "seen", "where", "names", "warnhistory", "banhistory", "geo");
 			registerCommandHandler(new AdminCommandHandler(), "restart");
 		}
+		config.
+		registerCommandHandler(new TicketCommandHandler(.config),);
+
 		registerCommandHandler(new ProxyCommandHandler(this), "who", "list","watch");
 		if (!loadConfig())
 			return;
