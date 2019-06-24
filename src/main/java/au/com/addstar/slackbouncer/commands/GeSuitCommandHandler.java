@@ -142,7 +142,7 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 					sender.sendMessage("Your query of " + search + " did not match a player", 
 						MessageOptions.builder()
 							.asUser(true)
-							.attachments(Arrays.asList(attachment))
+							.attachments(Collections.singletonList(attachment))
 							.mode(ParseMode.None)
 							.build()
 						);
@@ -203,7 +203,7 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 		sender.sendMessage("Heres the results", 
 			MessageOptions.builder()
 				.asUser(true)
-				.attachments(Arrays.asList(attachment))
+				.attachments(Collections.singletonList(attachment))
 				.mode(ParseMode.None)
 				.build()
 			);
@@ -218,7 +218,7 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 		String targetId;
 		if ( target == null )
 		{
-			Map<String, UUID> ids = DatabaseManager.players.resolvePlayerNamesHistoric(Arrays.asList(args[0]));
+			Map<String, UUID> ids = DatabaseManager.players.resolvePlayerNamesHistoric(Collections.singletonList(args[0]));
 			UUID id = Iterables.getFirst(ids.values(), null);
 			if ( id == null )
 			{
@@ -262,7 +262,7 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 		sender.sendMessage("Heres the results", 
 			MessageOptions.builder()
 				.asUser(true)
-				.attachments(Arrays.asList(attachment))
+				.attachments(Collections.singletonList(attachment))
 				.mode(ParseMode.None)
 				.build()
 			);
@@ -277,7 +277,7 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 		String targetId;
 		if ( target == null )
 		{
-			Map<String, UUID> ids = DatabaseManager.players.resolvePlayerNamesHistoric(Arrays.asList(args[0]));
+			Map<String, UUID> ids = DatabaseManager.players.resolvePlayerNamesHistoric(Collections.singletonList(args[0]));
 			UUID id = Iterables.getFirst(ids.values(), null);
 			if ( id == null )
 			{
@@ -319,7 +319,7 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 		sender.sendMessage("Heres the results", 
 			MessageOptions.builder()
 				.asUser(true)
-				.attachments(Arrays.asList(attachment))
+				.attachments(Collections.singletonList(attachment))
 				.mode(ParseMode.None)
 				.build()
 			);
@@ -338,7 +338,7 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 		}
 		catch ( IllegalArgumentException e )
 		{
-			Map<String, UUID> result = DatabaseManager.players.resolvePlayerNamesHistoric(Arrays.asList(nameOrId));
+			Map<String, UUID> result = DatabaseManager.players.resolvePlayerNamesHistoric(Collections.singletonList(nameOrId));
 			if ( result.isEmpty() )
 			{
 				sender.sendMessage("Can't find a player by that name", MessageOptions.DEFAULT);
@@ -366,7 +366,7 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 		sender.sendMessage("Heres the results", 
 			MessageOptions.builder()
 				.asUser(true)
-				.attachments(Arrays.asList(attachment))
+				.attachments(Collections.singletonList(attachment))
 				.mode(ParseMode.None)
 				.build()
 			);

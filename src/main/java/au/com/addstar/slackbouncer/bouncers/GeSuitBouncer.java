@@ -2,6 +2,7 @@ package au.com.addstar.slackbouncer.bouncers;
 
 import java.text.DateFormat;
 import java.util.Arrays;
+import java.util.Collections;
 
 import au.com.addstar.slackapi.objects.Attachment;
 import au.com.addstar.slackapi.MessageOptions;
@@ -75,7 +76,7 @@ public class GeSuitBouncer implements ISlackOutgoingBouncer, Listener
 		MessageOptions options = MessageOptions.builder()
 			.username("Ban Bot")
 			.asUser(false)
-			.attachments(Arrays.asList(attachment))
+			.attachments(Collections.singletonList(attachment))
 			.mode(ParseMode.Full)
 			.build();
 		
@@ -104,7 +105,7 @@ public class GeSuitBouncer implements ISlackOutgoingBouncer, Listener
 		MessageOptions options = MessageOptions.builder()
 			.username("Warn Bot")
 			.asUser(false)
-			.attachments(Arrays.asList(attachment))
+			.attachments(Collections.singletonList(attachment))
 			.mode(ParseMode.Full)
 			.build();
 		
@@ -129,7 +130,7 @@ public class GeSuitBouncer implements ISlackOutgoingBouncer, Listener
 		MessageOptions options = MessageOptions.builder()
 			.username("Ban Bot")
 			.asUser(false)
-			.attachments(Arrays.asList(attachment))
+			.attachments(Collections.singletonList(attachment))
 			.mode(ParseMode.Full)
 			.build();
 		

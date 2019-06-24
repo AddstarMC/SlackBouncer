@@ -75,6 +75,8 @@ public class BouncerPlugin extends Plugin
 		}
 
 		registerCommandHandler(new ProxyCommandHandler(this), "who", "list","watch");
+		registerOutgoingBouncer("monitor", MonitorBouncer.class);
+
 		if (!loadConfig())
 			return;
 		ConfigSection section = config.ticketConfig;
@@ -83,6 +85,7 @@ public class BouncerPlugin extends Plugin
 		}catch (Exception e){
 			this.getLogger().warning(e.getMessage());
 		}
+
 		getProxy().getPluginManager().registerCommand(this, new BouncerCommand(this));
 		tryStartBouncer();
 	}
@@ -354,7 +357,7 @@ public class BouncerPlugin extends Plugin
 			sender.sendMessage("", 
 				MessageOptions.builder()
 					.asUser(true)
-					.attachments(Arrays.asList(attachment))
+					.attachments(Collections.singletonList(attachment))
 					.mode(ParseMode.None)
 					.build()
 				);

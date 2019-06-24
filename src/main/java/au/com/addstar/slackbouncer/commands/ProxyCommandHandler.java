@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import au.com.addstar.slackbouncer.BouncerPlugin;
+import au.com.addstar.slackbouncer.bouncers.MonitorBouncer;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
@@ -24,7 +25,7 @@ public class ProxyCommandHandler implements ISlackCommandHandler
 	public ProxyCommandHandler(BouncerPlugin plugin) {
 		this.plugin = plugin;
 	}
-	
+
 	@Override
 	public String getUsage( String command )
 	{
@@ -42,11 +43,15 @@ public class ProxyCommandHandler implements ISlackCommandHandler
 			break;
 		case "monitor":
 			if(args.length < 1) {
-			
+			   throw new IllegalArgumentException("Please add a player to add");
 			}
 			String pName = args[0];
 			ProxiedPlayer player = ProxyServer.getInstance().getPlayer(pName);
-			
+			if(player != null)
+				MonitorBouncer.addWatched(player,sender.getUser());
+			else{
+				sender.sendMessage("Player not found");
+			}
 		}
 	}
 	
@@ -81,7 +86,7 @@ public class ProxyCommandHandler implements ISlackCommandHandler
 		sender.sendMessage("", 
 			MessageOptions.builder()
 				.asUser(true)
-				.attachments(Arrays.asList(attachment))
+				.attachments(Collections.singletonList(attachment))
 				.mode(ParseMode.None)
 				.build()
 			);

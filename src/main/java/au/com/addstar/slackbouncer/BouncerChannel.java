@@ -26,8 +26,8 @@ public class BouncerChannel
 	private final BouncerPlugin plugin;
 	private Conversation slackChannel;
 	
-	private List<ISlackIncomingBouncer> incoming;
-	private List<ISlackOutgoingBouncer> outgoing;
+	private final List<ISlackIncomingBouncer> incoming;
+	private final List<ISlackOutgoingBouncer> outgoing;
 	
 	public BouncerChannel(String name, BouncerPlugin plugin)
 	{

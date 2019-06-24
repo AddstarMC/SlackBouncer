@@ -8,9 +8,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import au.com.addstar.slackapi.objects.Conversation;
-import au.com.addstar.slackapi.objects.IdBaseObject;
 import au.com.addstar.slackapi.objects.Message;
-import au.com.addstar.slackapi.objects.blocks.Block;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
@@ -29,7 +27,12 @@ public class SlackCommandSender implements CommandSender
 {
 	private BouncerPlugin plugin;
 	private Bouncer bouncer;
-	private User user;
+
+	public User getUser() {
+		return user;
+	}
+
+	private final User user;
 	private Conversation channel;
 	
 	private boolean hasDoneTarget;
@@ -118,21 +121,16 @@ public class SlackCommandSender implements CommandSender
 	{
 		if (sendTask == null)
 		{
-			sendTask = plugin.getProxy().getScheduler().schedule(plugin, new Runnable()
-			{
-				@Override
-				public void run()
+			sendTask = plugin.getProxy().getScheduler().schedule(plugin, () -> {
+				synchronized(messages)
 				{
-					synchronized(messages)
+					if (!messages.isEmpty())
 					{
-						if (!messages.isEmpty())
-						{
-							String combined = Joiner.on('\n').join(messages);
-							messages.clear();
-							sendMessage(combined, MessageOptions.DEFAULT);
-						}
-						sendTask = null;
+						String combined = Joiner.on('\n').join(messages);
+						messages.clear();
+						sendMessage(combined, MessageOptions.DEFAULT);
 					}
+					sendTask = null;
 				}
 			}, 1, TimeUnit.SECONDS);
 		}
@@ -196,7 +194,7 @@ public class SlackCommandSender implements CommandSender
 				sourceId(channel.getId())
 				.userId(user.getId())
 				.as_user(true)
-				.blocks(new ArrayList<Block>())
+				.blocks(new ArrayList<>())
 				.subtype(Message.MessageType.Normal)
 				// .thread_ts(response.getTs())
 				.build();

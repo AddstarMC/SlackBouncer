@@ -14,7 +14,7 @@ import net.md_5.bungee.event.EventHandler;
  * Created for the AddstarMC Project. Created by Narimm on 19/02/2019.
  */
 public class MonitorBouncer implements ISlackOutgoingBouncer, Listener {
-    private Map<ProxiedPlayer, User> watched = new HashMap<>();
+    private static Map<ProxiedPlayer, User> watched = new HashMap<>();
     private BouncerChannel channel;
     private boolean enabled;
     
@@ -46,7 +46,9 @@ public class MonitorBouncer implements ISlackOutgoingBouncer, Listener {
             return res;
         }
     
-    
+    public static void addWatched(ProxiedPlayer player, User sender){
+        watched.put(player,sender);
+    }
     @Override
     public void load(ConfigSection section){
         enabled = section.has("monitor") && section.<Boolean>get("monitor");

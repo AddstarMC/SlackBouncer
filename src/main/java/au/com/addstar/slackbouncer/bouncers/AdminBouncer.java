@@ -9,7 +9,7 @@ import net.cubespace.Yamler.Config.ConfigSection;
  */
 public class AdminBouncer implements ISlackOutgoingBouncer {
     private boolean restarts;
-    private BouncerChannel mChannel;
+    private final BouncerChannel mChannel;
 
     public AdminBouncer(BouncerChannel mChannel) {
         this.mChannel = mChannel;
