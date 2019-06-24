@@ -24,14 +24,12 @@
 #        allowRestarts: false
 #    incoming: {}
 #
-# enableTicket: false
-# ticketConfig:
-#   MySQL:
-#     USE_MYSQL: true
-#     hostname: localhost
-#     hostport: 3306
-#     database: simpletickets
-#     user: simpletickets
-#     password: simpletickets
-#     properties:
-#     useSSL: false
+#ticketConfig:
+#  MySQL:
+#    hostname: localhost
+#    hostport: 3306
+#    database: simpletickets
+#    user: simpletickets
+#    password: simpletickets
+#    properties:
+#      useSSL: false

@@ -9,9 +9,11 @@ import me.odium.simplehelptickets.database.MySQLConnection;
 import me.odium.simplehelptickets.database.Table;
 import me.odium.simplehelptickets.manager.TicketManager;
 import me.odium.simplehelptickets.objects.Ticket;
+import net.cubespace.Yamler.Config.ConfigMapper;
 import net.cubespace.Yamler.Config.ConfigSection;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
 
+import javax.naming.ConfigurationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -24,14 +26,15 @@ import java.util.logging.Logger;
 public class TicketCommandHandler implements ISlackCommandHandler {
     private SimpleTicketManager manager;
 
-    public TicketCommandHandler(ConfigSection section) throws InvalidConfigurationException {
-        ConfigSection mysql = section.get("MySQL");
-        if(mysql == null) throw new InvalidConfigurationException("No MYSQL config found");
+    public TicketCommandHandler(ConfigSection parent) throws Exception  {
+        if(!parent.has("MySQL"))
+            throw new Exception("Could not locate configuration");
+        ConfigSection section = parent.get("MySQL");
         String host = section.get("hostname");
         String port = section.get("hostport");
         String dbName = section.get("database");
         Properties properties = new Properties();
-        ConfigSection props = mysql.get("properties");
+        ConfigSection props = section.get("properties");
         properties.put("useSSL", props.get("useSSL").toString());
         Logger log = Logger.getLogger("SlackBouncer");
         Database database = new MySQLConnection(host,port,properties,dbName,log);

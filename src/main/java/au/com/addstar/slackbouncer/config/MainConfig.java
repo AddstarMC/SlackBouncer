@@ -24,6 +24,6 @@ public class MainConfig extends YamlConfig
 	
 	public Map<String, ChannelDefinition> channels;
 	public List<String> commandHandlers;
-	private Map<String, ConfigSection> mysql;
+	public ConfigSection ticketConfig;
 
 }

@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import au.com.addstar.slackbouncer.bouncers.*;
 import au.com.addstar.slackbouncer.commands.*;
 import au.com.addstar.slackbouncer.bouncers.MonitorBouncer;
+import net.cubespace.Yamler.Config.ConfigSection;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -72,14 +73,17 @@ public class BouncerPlugin extends Plugin
 			registerCommandHandler(new GeSuitCommandHandler(), "seen", "where", "names", "warnhistory", "banhistory", "geo");
 			registerCommandHandler(new AdminCommandHandler(), "restart");
 		}
-		config.
-		registerCommandHandler(new TicketCommandHandler(.config),);
 
 		registerCommandHandler(new ProxyCommandHandler(this), "who", "list","watch");
 		if (!loadConfig())
 			return;
+		ConfigSection section = config.ticketConfig;
+		try {
+			registerCommandHandler(new TicketCommandHandler(section), "tickets", "reply");
+		}catch (Exception e){
+			this.getLogger().warning(e.getMessage());
+		}
 		getProxy().getPluginManager().registerCommand(this, new BouncerCommand(this));
-		
 		tryStartBouncer();
 	}
 	

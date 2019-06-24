@@ -3,9 +3,9 @@ package au.com.addstar.slackbouncer.bouncers;
 import java.text.DateFormat;
 import java.util.Arrays;
 
-import au.com.addstar.slackapi.Attachment;
+import au.com.addstar.slackapi.objects.Attachment;
 import au.com.addstar.slackapi.MessageOptions;
-import au.com.addstar.slackapi.Attachment.AttachmentField;
+import au.com.addstar.slackapi.objects.Attachment.AttachmentField;
 import au.com.addstar.slackapi.MessageOptions.ParseMode;
 import au.com.addstar.slackbouncer.BouncerChannel;
 import net.cubespace.Yamler.Config.ConfigSection;

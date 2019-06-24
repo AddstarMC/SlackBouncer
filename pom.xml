@@ -70,7 +70,7 @@
     <dependency>
       <groupId>au.com.addstar</groupId>
       <artifactId>waterfall-api</artifactId>
-      <version>1.13-SNAPSHOT</version>
+      <version>1.14-SNAPSHOT</version>
       <scope>provided</scope>
   	</dependency>
   	<dependency>
@@ -102,6 +102,12 @@
   		<version>1.0.0-SNAPSHOT</version>
   		<scope>provided</scope>
   	</dependency>
+      <dependency>
+          <groupId>org.projectlombok</groupId>
+          <artifactId>lombok</artifactId>
+          <version>1.18.8</version>
+          <scope>test</scope>
+      </dependency>
   </dependencies>
   
   <build>

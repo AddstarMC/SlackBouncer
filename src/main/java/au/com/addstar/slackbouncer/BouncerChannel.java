@@ -71,6 +71,7 @@ public class BouncerChannel
                 ISlackIncomingBouncer bouncer = plugin.makeIncomingBouncer(entry.getKey());
                 if (bouncer == null) {
                     plugin.getLogger().warning("Unknown incoming bouncer definition " + entry.getKey() + " in channel " + name);
+                    return;
                 }
                 try {
                     bouncer.load(entry.getValue());
@@ -87,9 +88,10 @@ public class BouncerChannel
                     if(bouncer instanceof ISlackCommandHandler){
                       plugin.registerCommandHandler((ISlackCommandHandler)bouncer,"cache_"+name);
                     }
-                    if (bouncer == null)
-                        plugin.getLogger().warning("Unknown outgoing bouncer definition " + entry.getKey() + " in channel " + name);
-
+                    if (bouncer == null) {
+						plugin.getLogger().warning("Unknown outgoing bouncer definition " + entry.getKey() + " in channel " + name);
+						return;
+					}
                     try {
                         bouncer.load(entry.getValue());
                         if (bouncer instanceof Listener)
@@ -161,4 +163,5 @@ public class BouncerChannel
 			plugin.getLogger().severe("Slack refused the message with: " + e.getMessage());
 		}
 	}
+
 }
