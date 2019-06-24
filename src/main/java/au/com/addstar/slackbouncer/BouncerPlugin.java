@@ -12,7 +12,7 @@ import java.util.Map.Entry;
 
 import au.com.addstar.slackbouncer.bouncers.*;
 import au.com.addstar.slackbouncer.commands.*;
-import au.com.addstar.slackbouncer.bouncers.MonitorBouncer;
+//import au.com.addstar.slackbouncer.bouncers.MonitorBouncer;
 import net.cubespace.Yamler.Config.ConfigSection;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -44,7 +44,7 @@ public class BouncerPlugin extends Plugin
 	
 	private MainConfig config;
 	private Bouncer bouncer;
-	private MonitorBouncer monitor;
+	//private MonitorBouncer monitor;
 
 	private List<BouncerChannel> channels;
 	
