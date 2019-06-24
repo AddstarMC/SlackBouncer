@@ -11,9 +11,9 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 
-import au.com.addstar.slackapi.Attachment;
+import au.com.addstar.slackapi.objects.Attachment;
 import au.com.addstar.slackapi.MessageOptions;
-import au.com.addstar.slackapi.Attachment.AttachmentField;
+import au.com.addstar.slackapi.objects.Attachment.AttachmentField;
 import au.com.addstar.slackapi.MessageOptions.ParseMode;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;

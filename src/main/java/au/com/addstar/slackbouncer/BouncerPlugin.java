@@ -21,14 +21,14 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import au.com.addstar.slackapi.Attachment;
-import au.com.addstar.slackapi.BaseChannel;
-import au.com.addstar.slackapi.DirectChannel;
-import au.com.addstar.slackapi.GroupChannel;
+import au.com.addstar.slackapi.objects.Attachment;
+import au.com.addstar.slackapi.objects.BaseObject;
+import au.com.addstar.slackapi.objects.Conversation;
+import au.com.addstar.slackapi.objects.GroupChannel;
 import au.com.addstar.slackapi.MessageOptions;
-import au.com.addstar.slackapi.NormalChannel;
-import au.com.addstar.slackapi.User;
-import au.com.addstar.slackapi.Message.MessageType;
+import au.com.addstar.slackapi.objects.NormalChannel;
+import au.com.addstar.slackapi.objects.User;
+import au.com.addstar.slackapi.objects.Message.MessageType;
 import au.com.addstar.slackapi.MessageOptions.ParseMode;
 import au.com.addstar.slackapi.events.MessageEvent;
 import au.com.addstar.slackapi.exceptions.SlackException;
@@ -44,7 +44,7 @@ public class BouncerPlugin extends Plugin
 	private MainConfig config;
 	private Bouncer bouncer;
 	private MonitorBouncer monitor;
-	
+
 	private List<BouncerChannel> channels;
 	
 	public BouncerPlugin()
@@ -59,7 +59,6 @@ public class BouncerPlugin extends Plugin
 	public void onEnable()
 	{
 		config = new MainConfig(new File(getDataFolder(), "config.yml"));
-		
 		if (getProxy().getPluginManager().getPlugin("BungeeChat") != null)
 		{
 			registerIncomingBouncer("bungeechat", BungeeChatBouncer.class);
@@ -73,7 +72,9 @@ public class BouncerPlugin extends Plugin
 			registerCommandHandler(new GeSuitCommandHandler(), "seen", "where", "names", "warnhistory", "banhistory", "geo");
 			registerCommandHandler(new AdminCommandHandler(), "restart");
 		}
-		if(getProxy())
+		config.
+		registerCommandHandler(new TicketCommandHandler(.config),);
+
 		registerCommandHandler(new ProxyCommandHandler(this), "who", "list","watch");
 		if (!loadConfig())
 			return;
@@ -226,7 +227,7 @@ public class BouncerPlugin extends Plugin
 	{
 		for (BouncerChannel bChannel : channels)
 		{
-			NormalChannel slackChannel = bouncer.getSession().getChannel(bChannel.getName());
+			Conversation slackChannel = bouncer.getSession().getChannel(bChannel.getName());
 			
 			if (slackChannel == null)
 			{
@@ -235,30 +236,9 @@ public class BouncerPlugin extends Plugin
 			}
 			
 			// Check that the client is in the channel (join if not)
-			if (!slackChannel.isClientMember())
+			if (!slackChannel.isMember())
 			{
-				if (slackChannel instanceof GroupChannel)
-					getLogger().severe("Not a member of group " + bChannel.getName() + ". Must be invited into group");
-				else
-				{
-					// Try to join the channel
-					try
-					{
-						getLogger().info("Not a member of channel " + bChannel.getName() + ". Joining...");
-						bouncer.getSlack().getChannelManager().joinChannel(slackChannel);
-						// Now a member, link the real channel to our channel
-						bChannel.link(slackChannel);
-					}
-					catch (IOException e)
-					{
-						getLogger().severe("An IOException occured while joining channel " + slackChannel.getName());
-						e.printStackTrace();
-					}
-					catch (SlackException e)
-					{
-						getLogger().severe("Unable to join channel " + slackChannel.getName() + e.toString());
-					}
-				}
+				getLogger().severe("Not a member of group " + bChannel.getName() + ". Must be invited into group");
 			}
 			else
 				// Is already a member, link the channel
@@ -294,14 +274,14 @@ public class BouncerPlugin extends Plugin
 			return;
 		
 		String message = SlackUtils.resolveGroups(event.getMessage().getText(), bouncer.getSession());
-		BaseChannel source = bouncer.getSession().getChannelById(event.getMessage().getSourceId());
+		Conversation source = bouncer.getSession().getChannelById(event.getMessage().getSourceId());
 		
 		// Command handling
 		if (event.getType() == MessageType.Normal)
 		{
 			String user = bouncer.getSession().getSelf().getName().toLowerCase();
 			
-			if (source instanceof DirectChannel || (message.toLowerCase().startsWith(user) || message.toLowerCase().startsWith("@" + user)))
+			if (source.isIM() || (message.toLowerCase().startsWith(user) || message.toLowerCase().startsWith("@" + user)))
 			{
 				processCommands(event.getUser(), source, message);
 				return;
@@ -319,7 +299,7 @@ public class BouncerPlugin extends Plugin
 		}
 	}
 	
-	private void processCommands(User source, BaseChannel channel, String text)
+	private void processCommands(User source, Conversation channel, String text)
 	{
 		int start;
 		

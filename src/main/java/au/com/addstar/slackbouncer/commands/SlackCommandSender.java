@@ -1,17 +1,21 @@
 package au.com.addstar.slackbouncer.commands;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import au.com.addstar.slackapi.objects.Conversation;
+import au.com.addstar.slackapi.objects.IdBaseObject;
+import au.com.addstar.slackapi.objects.Message;
+import au.com.addstar.slackapi.objects.blocks.Block;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-import au.com.addstar.slackapi.BaseChannel;
 import au.com.addstar.slackapi.MessageOptions;
-import au.com.addstar.slackapi.User;
+import au.com.addstar.slackapi.objects.User;
 import au.com.addstar.slackapi.exceptions.SlackException;
 import au.com.addstar.slackbouncer.Bouncer;
 import au.com.addstar.slackbouncer.BouncerPlugin;
@@ -26,14 +30,14 @@ public class SlackCommandSender implements CommandSender
 	private BouncerPlugin plugin;
 	private Bouncer bouncer;
 	private User user;
-	private BaseChannel channel;
+	private Conversation channel;
 	
 	private boolean hasDoneTarget;
 	
 	private ScheduledTask sendTask;
 	private List<String> messages;
 	
-	public SlackCommandSender(BouncerPlugin plugin, Bouncer bouncer, User user, BaseChannel channel)
+	public SlackCommandSender(BouncerPlugin plugin, Bouncer bouncer, User user, Conversation channel)
 	{
 		this.plugin = plugin;
 		this.bouncer = bouncer;
@@ -174,6 +178,28 @@ public class SlackCommandSender implements CommandSender
 
 	public boolean isSlackAdmin(){
 		return user.isAdmin();
+	}
+
+	public void sendMessage(Message message){
+		try {
+			bouncer.getSlack().sendMessage(message);
+		} catch (IOException e) {
+			plugin.getLogger().severe("An IOException occurred while sending a message:");
+			e.printStackTrace();
+		} catch (SlackException e) {
+			plugin.getLogger().severe("Slack refused the message with: " + e.getMessage());
+		}
+	}
+
+	public Message createSlackMessage(){
+		return Message.builder().
+				sourceId(channel.getId())
+				.userId(user.getId())
+				.as_user(true)
+				.blocks(new ArrayList<Block>())
+				.subtype(Message.MessageType.Normal)
+				// .thread_ts(response.getTs())
+				.build();
 	}
 
 }

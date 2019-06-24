@@ -7,6 +7,8 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import net.cubespace.Yamler.Config.ConfigSection;
+import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.cubespace.Yamler.Config.YamlConfig;
 
 public class MainConfig extends YamlConfig
@@ -22,4 +24,6 @@ public class MainConfig extends YamlConfig
 	
 	public Map<String, ChannelDefinition> channels;
 	public List<String> commandHandlers;
+	private Map<String, ConfigSection> mysql;
+
 }
