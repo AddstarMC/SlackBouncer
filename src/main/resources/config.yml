@@ -2,6 +2,7 @@
 #-----------------------
 #Uncomment below and paste your Slack application token
 #token: '*unspecified*'
+#
 #-----------------------
 #Start Channel Configurations
 #channels:
@@ -23,3 +24,14 @@
 #        allowRestarts: false
 #    incoming: {}
 #
+# enableTicket: false
+# ticketConfig:
+#   MySQL:
+#     USE_MYSQL: true
+#     hostname: localhost
+#     hostport: 3306
+#     database: simpletickets
+#     user: simpletickets
+#     password: simpletickets
+#     properties:
+#     useSSL: false
