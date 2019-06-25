@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -40,6 +41,8 @@ public class SimpleTicketManager {
             return Table.matchIdentifier("ticket");
     }
     public List<Ticket> getTickets(Table table, Ticket.Status status,int total) {
+        if(database == null)
+            return Collections.emptyList();
         String where;
         int param;
         where = " status = ?";

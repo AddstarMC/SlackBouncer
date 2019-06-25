@@ -24,12 +24,12 @@ public class TicketCommandHandler implements ISlackCommandHandler {
 
     public TicketCommandHandler(ConfigSection parent)   {
         ConfigSection section = parent.get("MYSQL");
-        String host = section.get("hostname");
-        String port = section.get("hostport").toString();
-        String dbName = section.get("database");
+        String host = (section.has("hostname"))?section.get("hostname"):"localhost";
+        String port = (section.has("hostport"))?section.get("hostport").toString():"3306";
+        String dbName = (section.has("database"))?section.get("database"):"simpletickets";
         Properties properties = new Properties();
-        ConfigSection props = section.get("properties");
-        properties.put("useSSL", props.get("useSSL").toString());
+        ConfigSection props =  (section.has("database"))?section.get("properties"):new ConfigSection();
+        properties.put("useSSL", props.has("useSSL")?props.get("useSSL").toString():"false");
         Logger log = Logger.getLogger("SlackBouncer");
         MySQLConnection database = null;
         try {
@@ -47,13 +47,18 @@ public class TicketCommandHandler implements ISlackCommandHandler {
 
     @Override
     public void onCommand(SlackCommandSender sender, String command, String[] args) throws IllegalStateException, IllegalArgumentException {
-        switch (command.toLowerCase())
-        {
-            case "tickets":
-                listTickets(sender);
-                break;
-            case "reply":
-                throw new IllegalArgumentException("Not yet Supported");
+        try {
+            switch (command.toLowerCase()) {
+                case "tickets":
+                    listTickets(sender);
+                    break;
+                case "reply":
+                    throw new IllegalArgumentException("Not yet Supported");
+            }
+        }catch (Exception e){
+            if(e instanceof IllegalArgumentException)
+                throw new IllegalArgumentException(e);
+            throw new IllegalStateException(e);
         }
     }
 
@@ -87,6 +92,13 @@ public class TicketCommandHandler implements ISlackCommandHandler {
             fields.add(normalField(t.getExpirationDate().toString()));
             ticket.setFields(fields);
             message.addBlock(ticket);
+        }
+        if(tickets.isEmpty()){
+            Section empty = new Section();
+            TextObject titleEmpty = new TextObject();
+            titleEmpty.setText("No Tickets to display");
+            empty.setText(titleEmpty);
+            message.addBlock(empty);
         }
         sender.sendMessage(message);
 
