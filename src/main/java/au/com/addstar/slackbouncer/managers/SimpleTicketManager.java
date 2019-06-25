@@ -1,9 +1,9 @@
 package au.com.addstar.slackbouncer.managers;
 
-import me.odium.simplehelptickets.database.Database;
-import me.odium.simplehelptickets.database.Table;
-import me.odium.simplehelptickets.objects.Ticket;
-import me.odium.simplehelptickets.objects.TicketLocation;
+import au.com.addstar.slackbouncer.database.MySQLConnection;
+import au.com.addstar.slackbouncer.objects.Table;
+import au.com.addstar.slackbouncer.objects.Ticket;
+import au.com.addstar.slackbouncer.objects.TicketLocation;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,17 +14,13 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-/**
- * Created for the Charlton IT Project.
- * Created by benjicharlton on 24/06/2019.
- */
 public class SimpleTicketManager {
 
-    private final Database database;
+    private final MySQLConnection database;
     private final Logger log;
     private final boolean reminderIdeas;
 
-    public SimpleTicketManager(Database database, Logger log, boolean reminderIdeas) {
+    public SimpleTicketManager(MySQLConnection database, Logger log, boolean reminderIdeas) {
         this.database = database;
         this.log = log;
         this.reminderIdeas = reminderIdeas;
@@ -55,22 +51,19 @@ public class SimpleTicketManager {
             limit = "";
         String sql = "SELECT * FROM " + table.tableName + " WHERE " + where + limit ;
         List<Ticket> tickets = new ArrayList<>();
-        Connection con = database.getConnection();
-        if (con != null) {
-            try {
+        try(
+                Connection con = database.getConnection();
                 PreparedStatement statement = con.prepareStatement(sql);
-                statement.setString(1, status.name());
-                ResultSet result = statement.executeQuery();
-                while (result.next()) {
-                    tickets.add(getFromResultRow(result));
-                }
-                con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
+        ) {
+            statement.setString(1, status.name());
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                tickets.add(getFromResultRow(result));
             }
-        } else {
-            log.warning("Unable to get Database Connection");
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+
         return tickets;
     }
     private Ticket getFromResultRow(ResultSet result) throws SQLException {

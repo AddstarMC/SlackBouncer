@@ -1,7 +1,6 @@
 package au.com.addstar.slackbouncer;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -12,9 +11,7 @@ import java.util.Map.Entry;
 
 import au.com.addstar.slackbouncer.bouncers.*;
 import au.com.addstar.slackbouncer.commands.*;
-//import au.com.addstar.slackbouncer.bouncers.MonitorBouncer;
 import net.cubespace.Yamler.Config.ConfigSection;
-import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.api.plugin.Plugin;
 
 import com.google.common.base.Joiner;
@@ -23,16 +20,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import au.com.addstar.slackapi.objects.Attachment;
-import au.com.addstar.slackapi.objects.BaseObject;
 import au.com.addstar.slackapi.objects.Conversation;
-import au.com.addstar.slackapi.objects.GroupChannel;
 import au.com.addstar.slackapi.MessageOptions;
-import au.com.addstar.slackapi.objects.NormalChannel;
 import au.com.addstar.slackapi.objects.User;
 import au.com.addstar.slackapi.objects.Message.MessageType;
 import au.com.addstar.slackapi.MessageOptions.ParseMode;
 import au.com.addstar.slackapi.events.MessageEvent;
-import au.com.addstar.slackapi.exceptions.SlackException;
 import au.com.addstar.slackbouncer.config.ChannelDefinition;
 import au.com.addstar.slackbouncer.config.MainConfig;
 
@@ -80,11 +73,8 @@ public class BouncerPlugin extends Plugin
 		if (!loadConfig())
 			return;
 		ConfigSection section = config.ticketConfig;
-		try {
-			registerCommandHandler(new TicketCommandHandler(section), "tickets", "reply");
-		}catch (Exception e){
-			this.getLogger().warning(e.getMessage());
-		}
+		registerCommandHandler(new TicketCommandHandler(section), "tickets", "reply");
+
 
 		getProxy().getPluginManager().registerCommand(this, new BouncerCommand(this));
 		tryStartBouncer();
@@ -109,7 +99,7 @@ public class BouncerPlugin extends Plugin
 			loadChannels();
 			return true;
 		}
-		catch (InvalidConfigurationException e)
+		catch (Exception e)
 		{
 			getLogger().severe("Unable to load configuration: " + e.getMessage());
 			return false;

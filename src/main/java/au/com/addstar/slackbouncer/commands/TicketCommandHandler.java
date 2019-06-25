@@ -3,17 +3,13 @@ package au.com.addstar.slackbouncer.commands;
 import au.com.addstar.slackapi.objects.Message;
 import au.com.addstar.slackapi.objects.blocks.Section;
 import au.com.addstar.slackapi.objects.blocks.composition.TextObject;
+import au.com.addstar.slackbouncer.database.MySQLConnection;
 import au.com.addstar.slackbouncer.managers.SimpleTicketManager;
-import me.odium.simplehelptickets.database.Database;
-import me.odium.simplehelptickets.database.MySQLConnection;
-import me.odium.simplehelptickets.database.Table;
-import me.odium.simplehelptickets.manager.TicketManager;
-import me.odium.simplehelptickets.objects.Ticket;
-import net.cubespace.Yamler.Config.ConfigMapper;
+import au.com.addstar.slackbouncer.objects.Table;
+import au.com.addstar.slackbouncer.objects.Ticket;
 import net.cubespace.Yamler.Config.ConfigSection;
-import net.cubespace.Yamler.Config.InvalidConfigurationException;
 
-import javax.naming.ConfigurationException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -26,18 +22,21 @@ import java.util.logging.Logger;
 public class TicketCommandHandler implements ISlackCommandHandler {
     private SimpleTicketManager manager;
 
-    public TicketCommandHandler(ConfigSection parent) throws Exception  {
-        if(!parent.has("MySQL"))
-            throw new Exception("Could not locate configuration");
-        ConfigSection section = parent.get("MySQL");
+    public TicketCommandHandler(ConfigSection parent)   {
+        ConfigSection section = parent.get("MYSQL");
         String host = section.get("hostname");
-        String port = section.get("hostport");
+        String port = section.get("hostport").toString();
         String dbName = section.get("database");
         Properties properties = new Properties();
         ConfigSection props = section.get("properties");
         properties.put("useSSL", props.get("useSSL").toString());
         Logger log = Logger.getLogger("SlackBouncer");
-        Database database = new MySQLConnection(host,port,properties,dbName,log);
+        MySQLConnection database = null;
+        try {
+            database = new MySQLConnection(host, port,dbName, properties);
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
         manager = new SimpleTicketManager(database,log,false);
     }
 
@@ -59,7 +58,7 @@ public class TicketCommandHandler implements ISlackCommandHandler {
     }
 
     private void listTickets(SlackCommandSender sender){
-        Table table = TicketManager.getTableName("ticket");
+        Table table = SimpleTicketManager.getTableName("ticket");
         List<Ticket> tickets =  manager.getTickets(table, Ticket.Status.OPEN,5);
         Message message = sender.createSlackMessage();
         TextObject title = new TextObject();
