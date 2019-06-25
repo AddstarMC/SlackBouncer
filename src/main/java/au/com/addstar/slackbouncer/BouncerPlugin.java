@@ -1,6 +1,7 @@
 package au.com.addstar.slackbouncer;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -9,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import au.com.addstar.slackapi.SlackAPI;
+import au.com.addstar.slackapi.exceptions.SlackException;
+import au.com.addstar.slackapi.objects.Message;
 import au.com.addstar.slackbouncer.bouncers.*;
 import au.com.addstar.slackbouncer.commands.*;
 import net.cubespace.Yamler.Config.ConfigSection;
@@ -63,7 +67,7 @@ public class BouncerPlugin extends Plugin
 		{
 			registerOutgoingBouncer("gesuit", GeSuitBouncer.class);
 			registerOutgoingBouncer("admin", AdminBouncer.class);
-			registerCommandHandler(new GeSuitCommandHandler(), "seen", "where", "names", "warnhistory", "banhistory", "geo");
+			registerCommandHandler(new GeSuitCommandHandler(), "seen", "where", "names", "warnhistory", "banhistory", "geo","ban","unban");
 			registerCommandHandler(new AdminCommandHandler(), "restart");
 		}
 
@@ -358,7 +362,18 @@ public class BouncerPlugin extends Plugin
 		ISlackCommandHandler handler = commandHandlers.get(command.toLowerCase());
 		if (handler == null)
 		{
-			sender.sendMessage("I dont know what to do with _" + command + "_");
+            Message message = Message.builder()
+                    .userId(sender.getUser().getId())
+                    .sourceId(channel.getId())
+                    .subtype(MessageType.Normal)
+                    .text("I dont know what to do with _" + command + "_")
+                    .build();
+            try {
+                bouncer.getSlack().sendMessage(message);
+            } catch (IOException | SlackException e) {
+                e.printStackTrace();
+            }
+            //sender.sendMessage("I dont know what to do with _" + command + "_");
 			return;
 		}
 		
