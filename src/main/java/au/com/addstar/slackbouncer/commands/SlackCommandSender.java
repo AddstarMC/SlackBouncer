@@ -128,6 +128,8 @@ public class SlackCommandSender implements CommandSender
 					{
 						String combined = Joiner.on('\n').join(messages);
 						messages.clear();
+						Message message = createSlackMessage();
+
 						sendMessage(combined, MessageOptions.DEFAULT);
 					}
 					sendTask = null;
@@ -188,12 +190,20 @@ public class SlackCommandSender implements CommandSender
 			plugin.getLogger().severe("Slack refused the message with: " + e.getMessage());
 		}
 	}
-
+    public void sendEphemeral(Message message){
+        try {
+            bouncer.getSlack().sendEphemeral(message);
+        } catch (IOException e) {
+            plugin.getLogger().severe("An IOException occurred while sending a message:");
+            e.printStackTrace();
+        } catch (SlackException e) {
+            plugin.getLogger().severe("Slack refused the message with: " + e.getMessage());
+        }
+    }
 	public Message createSlackMessage(){
 		return Message.builder().
 				sourceId(channel.getId())
 				.userId(user.getId())
-				.as_user(true)
 				.blocks(new ArrayList<>())
 				.subtype(Message.MessageType.Normal)
 				// .thread_ts(response.getTs())
