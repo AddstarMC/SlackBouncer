@@ -38,7 +38,7 @@ public class SlackCommandSender implements CommandSender
 	private boolean hasDoneTarget;
 	
 	private ScheduledTask sendTask;
-	private List<String> messages;
+	private final List<String> messages;
 	
 	public SlackCommandSender(BouncerPlugin plugin, Bouncer bouncer, User user, Conversation channel)
 	{
@@ -148,8 +148,13 @@ public class SlackCommandSender implements CommandSender
 		
 		try
 		{
-			bouncer.getSlack().sendMessage(SlackUtils.toSlack(message), channel, options);
+		    Message out = Message.builder()
+                    .conversationID(channel.getId())
+                    .text((SlackUtils.toSlack(message))).build();
+
+			bouncer.getSlack().sendMessage(out,options);
 		}
+
 		catch (IOException e)
 		{
 			plugin.getLogger().severe("An IOException occurred while sending a message:");
@@ -202,7 +207,7 @@ public class SlackCommandSender implements CommandSender
     }
 	public Message createSlackMessage(){
 		return Message.builder().
-				sourceId(channel.getId())
+				conversationID(channel.getId())
 				.userId(user.getId())
 				.blocks(new ArrayList<>())
 				.subtype(Message.MessageType.Normal)
