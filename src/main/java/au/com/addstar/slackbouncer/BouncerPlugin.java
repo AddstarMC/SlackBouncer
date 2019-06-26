@@ -275,7 +275,7 @@ public class BouncerPlugin extends Plugin
 			return;
 		
 		String message = SlackUtils.resolveGroups(event.getMessage().getText(), bouncer.getSession());
-		Conversation source = bouncer.getSession().getChannelById(event.getMessage().getSourceId());
+		Conversation source = bouncer.getSession().getChannelById(event.getMessage().getConversationID());
 		
 		// Command handling
 		if (event.getType() == MessageType.Normal)
@@ -295,7 +295,7 @@ public class BouncerPlugin extends Plugin
 			if (channel.getSlackChannel() == null)
 				continue;
 			
-			if (channel.getSlackChannel().getId().equals(event.getMessage().getSourceId()))
+			if (channel.getSlackChannel().getId().equals(event.getMessage().getConversationID()))
 				channel.onMessage(message, event.getUser(), event.getType());
 		}
 	}
@@ -320,7 +320,11 @@ public class BouncerPlugin extends Plugin
 		
 		if (arguments.length < start+1)
 		{
-			sender.sendMessage("You did not give me a command");
+
+			sender.sendEphemeral(Message.builder()
+                    .userId(sender.getUser().getId())
+                    .conversationID(channel.getId())
+                    .text("You did not give me a command").build());
 			return;
 		}
 		
@@ -347,15 +351,12 @@ public class BouncerPlugin extends Plugin
 			
 			attachment.setText(Joiner.on('\n').join(commands));
 			attachment.setFormatText(false);
-			
-			sender.sendMessage("", 
-				MessageOptions.builder()
-					.asUser(true)
-					.attachments(Collections.singletonList(attachment))
-					.mode(ParseMode.None)
-					.build()
-				);
-			
+            Message out = Message.builder()
+                    .conversationID(channel.getId())
+                    .userId(sender.getUser().getId())
+                    .attachments(Collections.singletonList(attachment))
+                    .build();
+			sender.sendEphemeral(out);
 			return;
 		}
 		
@@ -364,12 +365,12 @@ public class BouncerPlugin extends Plugin
 		{
             Message message = Message.builder()
                     .userId(sender.getUser().getId())
-                    .sourceId(channel.getId())
+                    .conversationID(channel.getId())
                     .subtype(MessageType.Normal)
                     .text("I dont know what to do with _" + command + "_")
                     .build();
             try {
-                bouncer.getSlack().sendMessage(message);
+                bouncer.getSlack().sendEphemeral(message);
             } catch (IOException | SlackException e) {
                 e.printStackTrace();
             }
