@@ -32,6 +32,8 @@ public class TicketCommandHandler implements ISlackCommandHandler {
         Properties properties = new Properties();
         ConfigSection props =  (section.has("database"))?section.get("properties"):new ConfigSection();
         properties.put("useSSL", props.has("useSSL")?props.get("useSSL").toString():"false");
+        properties.put("user", props.has("user")?props.get("user").toString():"username");
+        properties.put("password", props.has("password")?props.get("password").toString():"password");
         Logger log = Logger.getLogger("SlackBouncer");
         MySQLConnection database = null;
         try {

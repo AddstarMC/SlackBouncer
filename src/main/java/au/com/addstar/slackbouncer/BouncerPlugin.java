@@ -323,7 +323,11 @@ public class BouncerPlugin extends Plugin
 		
 		if (arguments.length < start+1)
 		{
-			sender.sendMessage("You did not give me a command");
+
+			sender.sendEphemeral(Message.builder()
+                    .userId(sender.getUser().getId())
+                    .conversationID(channel.getId())
+                    .text("You did not give me a command").build());
 			return;
 		}
 		
@@ -350,15 +354,12 @@ public class BouncerPlugin extends Plugin
 			
 			attachment.setText(Joiner.on('\n').join(commands));
 			attachment.setFormatText(false);
-			
-			sender.sendMessage("", 
-				MessageOptions.builder()
-					.asUser(true)
-					.attachments(Collections.singletonList(attachment))
-					.mode(MessageOptions.ParseMode.None)
-					.build()
-				);
-			
+            Message out = Message.builder()
+                    .conversationID(channel.getId())
+                    .userId(sender.getUser().getId())
+                    .attachments(Collections.singletonList(attachment))
+                    .build();
+            sender.sendEphemeral(out);
 			return;
 		}
 		
@@ -372,7 +373,7 @@ public class BouncerPlugin extends Plugin
                     .text("I dont know what to do with _" + command + "_")
                     .build();
             try {
-                bouncer.getSlack().sendMessage(message);
+                bouncer.getSlack().sendEphemeral(message);
             } catch (IOException | SlackException e) {
                 e.printStackTrace();
             }

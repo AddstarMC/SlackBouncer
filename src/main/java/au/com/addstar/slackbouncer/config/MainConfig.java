@@ -19,7 +19,16 @@ public class MainConfig extends YamlConfig
 		commandHandlers = Lists.newArrayList();
 		ticketConfig = new ConfigSection();
 		ticketConfig.set("enabled",false);
-		ticketConfig.set("MYSQL", new ConfigSection());
+		ConfigSection mysql = new ConfigSection();
+		mysql.set("hostname","localhost");
+        mysql.set("hostport","3306");
+        mysql.set("database","databaseName");
+        ConfigSection props = new ConfigSection();
+        props.set("useSSL",false);
+        props.set("user","username");
+        props.set("password","password");
+        mysql.set("properties",props);
+        ticketConfig.set("MYSQL", mysql);
 	}
 	
 	public String token = "*unspecified*";
