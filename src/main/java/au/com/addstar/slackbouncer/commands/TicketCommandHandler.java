@@ -1,12 +1,13 @@
 package au.com.addstar.slackbouncer.commands;
 
-import au.com.addstar.slackapi.objects.Message;
-import au.com.addstar.slackapi.objects.blocks.Section;
-import au.com.addstar.slackapi.objects.blocks.composition.TextObject;
+
 import au.com.addstar.slackbouncer.database.MySQLConnection;
 import au.com.addstar.slackbouncer.managers.SimpleTicketManager;
 import au.com.addstar.slackbouncer.objects.Table;
 import au.com.addstar.slackbouncer.objects.Ticket;
+import io.github.slackapi4j.objects.Message;
+import io.github.slackapi4j.objects.blocks.Section;
+import io.github.slackapi4j.objects.blocks.composition.TextObject;
 import net.cubespace.Yamler.Config.ConfigSection;
 
 import java.sql.SQLException;
@@ -21,6 +22,7 @@ import java.util.logging.Logger;
  */
 public class TicketCommandHandler implements ISlackCommandHandler {
     private SimpleTicketManager manager;
+    private boolean enabled;
 
     public TicketCommandHandler(ConfigSection parent)   {
         ConfigSection section = parent.get("MYSQL");
@@ -34,10 +36,14 @@ public class TicketCommandHandler implements ISlackCommandHandler {
         MySQLConnection database = null;
         try {
             database = new MySQLConnection(host, port,dbName, properties);
+            manager = new SimpleTicketManager(database,log,false);
+            enabled = true;
+            log.info("TicketManager has been configured - Ticket management is available");
         }catch (SQLException e) {
-            e.printStackTrace();
+            enabled =false;
+            log.info("TicketManager has not be able to configure a database connection - Ticket management is NOT available");
+            log.severe(e.getMessage());
         }
-        manager = new SimpleTicketManager(database,log,false);
     }
 
     @Override
@@ -48,6 +54,10 @@ public class TicketCommandHandler implements ISlackCommandHandler {
     @Override
     public void onCommand(SlackCommandSender sender, String command, String[] args) throws IllegalStateException, IllegalArgumentException {
         try {
+            if(!enabled){
+                notEnabled(sender);
+                return;
+            }
             switch (command.toLowerCase()) {
                 case "tickets":
                     listTickets(sender);
@@ -61,7 +71,11 @@ public class TicketCommandHandler implements ISlackCommandHandler {
             throw new IllegalStateException(e);
         }
     }
-
+    private void notEnabled(SlackCommandSender sender){
+        Message message = sender.createSlackMessage();
+        message.setText("The ticket manager is not available.");
+        sender.sendEphemeral(message);
+    }
     private void listTickets(SlackCommandSender sender){
         Table table = SimpleTicketManager.getTableName("ticket");
         List<Ticket> tickets =  manager.getTickets(table, Ticket.Status.OPEN,5);

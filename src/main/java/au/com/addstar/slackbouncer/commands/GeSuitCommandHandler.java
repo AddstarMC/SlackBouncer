@@ -1,12 +1,11 @@
 package au.com.addstar.slackbouncer.commands;
 
-import au.com.addstar.slackapi.objects.Attachment;
-import au.com.addstar.slackapi.objects.Attachment.AttachmentField;
-import au.com.addstar.slackapi.MessageOptions;
-import au.com.addstar.slackapi.MessageOptions.ParseMode;
+
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import io.github.slackapi4j.MessageOptions;
+import io.github.slackapi4j.objects.Attachment;
 import net.cubespace.geSuit.Utilities;
 import net.cubespace.geSuit.geSuit;
 import net.cubespace.geSuit.managers.*;
@@ -83,7 +82,7 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 		MessageOptions options = MessageOptions.builder()
 			.asUser(true)
 			.format(false)
-			.mode(ParseMode.None)
+			.mode(MessageOptions.ParseMode.None)
 			.build();
 		sender.sendMessage("\n" + seenInfo, options);
 	}
@@ -143,7 +142,7 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 						MessageOptions.builder()
 							.asUser(true)
 							.attachments(Collections.singletonList(attachment))
-							.mode(ParseMode.None)
+							.mode(MessageOptions.ParseMode.None)
 							.build()
 						);
 					return;
@@ -163,7 +162,7 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 					final ProxiedPlayer player = geSuit.proxy.getPlayer(searchString);
 					String location = GeoIPManager.lookup(player.getAddress().getAddress());
 					if ( location != null )
-						attachment.addField(new AttachmentField("Location", location, false));
+						attachment.addField(new Attachment.AttachmentField("Location", location, false));
 				}
 			}
 		}
@@ -204,7 +203,7 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 			MessageOptions.builder()
 				.asUser(true)
 				.attachments(Collections.singletonList(attachment))
-				.mode(ParseMode.None)
+				.mode(MessageOptions.ParseMode.None)
 				.build()
 			);
 	}
@@ -263,7 +262,7 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 			MessageOptions.builder()
 				.asUser(true)
 				.attachments(Collections.singletonList(attachment))
-				.mode(ParseMode.None)
+				.mode(MessageOptions.ParseMode.None)
 				.build()
 			);
 	}
@@ -320,7 +319,7 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 			MessageOptions.builder()
 				.asUser(true)
 				.attachments(Collections.singletonList(attachment))
-				.mode(ParseMode.None)
+				.mode(MessageOptions.ParseMode.None)
 				.build()
 			);
 	}
@@ -367,7 +366,7 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 			MessageOptions.builder()
 				.asUser(true)
 				.attachments(Collections.singletonList(attachment))
-				.mode(ParseMode.None)
+				.mode(MessageOptions.ParseMode.None)
 				.build()
 			);
 	}

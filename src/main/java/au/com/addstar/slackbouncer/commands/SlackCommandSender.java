@@ -7,17 +7,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import au.com.addstar.slackapi.objects.Conversation;
-import au.com.addstar.slackapi.objects.Message;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-import au.com.addstar.slackapi.MessageOptions;
-import au.com.addstar.slackapi.objects.User;
-import au.com.addstar.slackapi.exceptions.SlackException;
 import au.com.addstar.slackbouncer.Bouncer;
 import au.com.addstar.slackbouncer.BouncerPlugin;
 import au.com.addstar.slackbouncer.SlackUtils;
+import io.github.slackapi4j.MessageOptions;
+import io.github.slackapi4j.exceptions.SlackException;
+import io.github.slackapi4j.objects.Conversation;
+import io.github.slackapi4j.objects.Message;
+import io.github.slackapi4j.objects.User;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -202,7 +202,7 @@ public class SlackCommandSender implements CommandSender
     }
 	public Message createSlackMessage(){
 		return Message.builder().
-				sourceId(channel.getId())
+				conversationID(channel.getId())
 				.userId(user.getId())
 				.blocks(new ArrayList<>())
 				.subtype(Message.MessageType.Normal)

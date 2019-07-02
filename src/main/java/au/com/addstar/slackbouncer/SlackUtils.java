@@ -3,8 +3,11 @@ package au.com.addstar.slackbouncer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import au.com.addstar.slackapi.objects.*;
-import au.com.addstar.slackapi.RealTimeSession;
+
+import io.github.slackapi4j.RealTimeSession;
+import io.github.slackapi4j.objects.Conversation;
+import io.github.slackapi4j.objects.ObjectID;
+import io.github.slackapi4j.objects.User;
 import net.md_5.bungee.api.ChatColor;
 
 public class SlackUtils

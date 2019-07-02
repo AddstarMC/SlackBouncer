@@ -18,6 +18,7 @@ public class MainConfig extends YamlConfig
 		channels = Maps.newHashMap();
 		commandHandlers = Lists.newArrayList();
 		ticketConfig = new ConfigSection();
+		ticketConfig.set("enabled",false);
 		ticketConfig.set("MYSQL", new ConfigSection());
 	}
 	

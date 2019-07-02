@@ -4,15 +4,16 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.TimeUnit;
 
+import io.github.slackapi4j.RealTimeSession;
+import io.github.slackapi4j.SlackAPI;
+import io.github.slackapi4j.eventListeners.RealTimeListener;
+import io.github.slackapi4j.events.MessageEvent;
+import io.github.slackapi4j.events.RealTimeEvent;
+import io.github.slackapi4j.exceptions.SlackException;
+import io.github.slackapi4j.exceptions.SlackRTException;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
-import au.com.addstar.slackapi.RealTimeListener;
-import au.com.addstar.slackapi.RealTimeSession;
-import au.com.addstar.slackapi.SlackAPI;
-import au.com.addstar.slackapi.events.MessageEvent;
-import au.com.addstar.slackapi.events.RealTimeEvent;
-import au.com.addstar.slackapi.exceptions.SlackException;
-import au.com.addstar.slackapi.exceptions.SlackRTException;
+
 
 public class Bouncer implements RealTimeListener
 {

@@ -2,8 +2,8 @@ package au.com.addstar.slackbouncer.bouncers;
 
 import java.util.*;
 
-import au.com.addstar.slackapi.objects.User;
 import au.com.addstar.slackbouncer.BouncerChannel;
+import io.github.slackapi4j.objects.User;
 import net.cubespace.Yamler.Config.ConfigSection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PostLoginEvent;

@@ -4,18 +4,19 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map.Entry;
 
-import au.com.addstar.slackapi.objects.Conversation;
 import au.com.addstar.slackbouncer.commands.ISlackCommandHandler;
+import io.github.slackapi4j.MessageOptions;
+import io.github.slackapi4j.exceptions.SlackException;
+import io.github.slackapi4j.objects.Conversation;
+import io.github.slackapi4j.objects.Message;
+import io.github.slackapi4j.objects.User;
 import net.cubespace.Yamler.Config.ConfigSection;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.api.plugin.Listener;
 
 import com.google.common.collect.Lists;
 
-import au.com.addstar.slackapi.MessageOptions;
-import au.com.addstar.slackapi.objects.User;
-import au.com.addstar.slackapi.objects.Message.MessageType;
-import au.com.addstar.slackapi.exceptions.SlackException;
+
 import au.com.addstar.slackbouncer.bouncers.ISlackIncomingBouncer;
 import au.com.addstar.slackbouncer.bouncers.ISlackOutgoingBouncer;
 import au.com.addstar.slackbouncer.config.ChannelDefinition;
@@ -111,7 +112,7 @@ public class BouncerChannel
 		slackChannel = channel;
 	}
 	
-	public void onMessage(String message, User sender, MessageType type)
+	public void onMessage(String message, User sender, Message.MessageType type)
 	{
 		for (ISlackIncomingBouncer bouncer : incoming)
 			bouncer.onMessage(message, sender, type);

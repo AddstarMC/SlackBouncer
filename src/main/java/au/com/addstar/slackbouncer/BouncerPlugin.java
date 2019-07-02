@@ -10,11 +10,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import au.com.addstar.slackapi.SlackAPI;
-import au.com.addstar.slackapi.exceptions.SlackException;
-import au.com.addstar.slackapi.objects.Message;
+
 import au.com.addstar.slackbouncer.bouncers.*;
 import au.com.addstar.slackbouncer.commands.*;
+import io.github.slackapi4j.MessageOptions;
+import io.github.slackapi4j.events.MessageEvent;
+import io.github.slackapi4j.exceptions.SlackException;
+import io.github.slackapi4j.internal.Utilities;
+import io.github.slackapi4j.objects.Attachment;
+import io.github.slackapi4j.objects.Conversation;
+import io.github.slackapi4j.objects.Message;
+import io.github.slackapi4j.objects.User;
 import net.cubespace.Yamler.Config.ConfigSection;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -23,13 +29,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import au.com.addstar.slackapi.objects.Attachment;
-import au.com.addstar.slackapi.objects.Conversation;
-import au.com.addstar.slackapi.MessageOptions;
-import au.com.addstar.slackapi.objects.User;
-import au.com.addstar.slackapi.objects.Message.MessageType;
-import au.com.addstar.slackapi.MessageOptions.ParseMode;
-import au.com.addstar.slackapi.events.MessageEvent;
+
 import au.com.addstar.slackbouncer.config.ChannelDefinition;
 import au.com.addstar.slackbouncer.config.MainConfig;
 
@@ -77,8 +77,11 @@ public class BouncerPlugin extends Plugin
 		if (!loadConfig())
 			return;
 		ConfigSection section = config.ticketConfig;
-		registerCommandHandler(new TicketCommandHandler(section), "tickets", "reply");
-
+		if(Boolean.parseBoolean(section.get("enabled"))) {
+            registerCommandHandler(new TicketCommandHandler(section), "tickets", "reply");
+        }else{
+		    getLogger().info("TicketManager is disabled via configuration.");
+        }
 
 		getProxy().getPluginManager().registerCommand(this, new BouncerCommand(this));
 		tryStartBouncer();
@@ -275,10 +278,10 @@ public class BouncerPlugin extends Plugin
 			return;
 		
 		String message = SlackUtils.resolveGroups(event.getMessage().getText(), bouncer.getSession());
-		Conversation source = bouncer.getSession().getChannelById(event.getMessage().getSourceId());
+		Conversation source = bouncer.getSession().getChannelById(event.getMessage().getConversationID());
 		
 		// Command handling
-		if (event.getType() == MessageType.Normal)
+		if (event.getType() == Message.MessageType.Normal)
 		{
 			String user = bouncer.getSession().getSelf().getName().toLowerCase();
 			
@@ -295,7 +298,7 @@ public class BouncerPlugin extends Plugin
 			if (channel.getSlackChannel() == null)
 				continue;
 			
-			if (channel.getSlackChannel().getId().equals(event.getMessage().getSourceId()))
+			if (channel.getSlackChannel().getId().equals(event.getMessage().getConversationID()))
 				channel.onMessage(message, event.getUser(), event.getType());
 		}
 	}
@@ -352,7 +355,7 @@ public class BouncerPlugin extends Plugin
 				MessageOptions.builder()
 					.asUser(true)
 					.attachments(Collections.singletonList(attachment))
-					.mode(ParseMode.None)
+					.mode(MessageOptions.ParseMode.None)
 					.build()
 				);
 			
@@ -364,8 +367,8 @@ public class BouncerPlugin extends Plugin
 		{
             Message message = Message.builder()
                     .userId(sender.getUser().getId())
-                    .sourceId(channel.getId())
-                    .subtype(MessageType.Normal)
+                    .conversationID(channel.getId())
+                    .subtype(Message.MessageType.Normal)
                     .text("I dont know what to do with _" + command + "_")
                     .build();
             try {

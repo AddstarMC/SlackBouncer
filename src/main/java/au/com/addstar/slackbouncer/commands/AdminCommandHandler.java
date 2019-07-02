@@ -1,6 +1,6 @@
 package au.com.addstar.slackbouncer.commands;
 
-import au.com.addstar.slackapi.MessageOptions;
+import io.github.slackapi4j.MessageOptions;
 import net.cubespace.geSuit.managers.AdminCommandManager;
 
 /**
@@ -16,7 +16,7 @@ public class AdminCommandHandler implements ISlackCommandHandler {
     @Override
     public void onCommand(SlackCommandSender sender, String command, String[] args) throws IllegalStateException, IllegalArgumentException {
         if (!sender.isSlackAdmin()){
-            sender.sendMessage("You cannot use this slack command as you are NOT a Slack Admin.",MessageOptions.DEFAULT);
+            sender.sendMessage("You cannot use this slack command as you are NOT a Slack Admin.", MessageOptions.DEFAULT);
         }
         switch (command) {
             case "restart":

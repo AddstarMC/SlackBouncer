@@ -27,18 +27,6 @@
             <timezone>10</timezone>
         </developer>
     </developers>
-    <distributionManagement>
-        <repository>
-            <id>maven.addstar.com.au</id>
-            <name>maven.addstar.com.au-releases</name>
-            <url>http://maven.addstar.com.au/artifactory/ext-release-local</url>
-        </repository>
-        <snapshotRepository>
-            <id>maven.addstar.com.au</id>
-            <name>maven.addstar.com.au-snapshots</name>
-            <url>http://maven.addstar.com.au/artifactory/ext-snapshot-local</url>
-        </snapshotRepository>
-    </distributionManagement>
   <repositories>
     <!-- Addstar repos -->
     <repository>
@@ -64,6 +52,10 @@
       <id>md_5</id>
       <url>https://oss.sonatype.org/content/groups/public/</url>
     </repository>
+      <repository>
+          <id>central</id>
+          <url>http://repo1.maven.org/maven2/</url>
+      </repository>
   </repositories>
 
   <dependencies>
@@ -86,9 +78,9 @@
   		<scope>provided</scope>
   	</dependency>
   	<dependency>
-  	  <groupId>au.com.addstar</groupId>
-  	  <artifactId>slack-api</artifactId>
-  	  <version>0.0.2-SNAPSHOT</version>
+  	  <groupId>io.github.slackapi4j</groupId>
+  	  <artifactId>slack-api-4j</artifactId>
+  	  <version>0.0.2</version>
   	  <scope>compile</scope>
   	</dependency>
   	<dependency>

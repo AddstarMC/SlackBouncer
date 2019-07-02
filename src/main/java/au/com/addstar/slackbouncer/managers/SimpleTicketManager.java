@@ -1,6 +1,6 @@
 package au.com.addstar.slackbouncer.managers;
 
-import au.com.addstar.slackbouncer.database.MySQLConnection;
+import au.com.addstar.slackbouncer.database.Database;
 import au.com.addstar.slackbouncer.objects.Table;
 import au.com.addstar.slackbouncer.objects.Ticket;
 import au.com.addstar.slackbouncer.objects.TicketLocation;
@@ -17,15 +17,21 @@ import java.util.logging.Logger;
 
 public class SimpleTicketManager {
 
-    private final MySQLConnection database;
+    private final Database database;
     private final Logger log;
     private final boolean reminderIdeas;
+    private boolean available;
 
-    public SimpleTicketManager(MySQLConnection database, Logger log, boolean reminderIdeas) {
+    public SimpleTicketManager(Database database, Logger log, boolean reminderIdeas) {
         this.database = database;
         this.log = log;
         this.reminderIdeas = reminderIdeas;
-
+        try {
+            database.open();
+            available = true;
+        }catch (SQLException e){
+            available = false;
+        }
     }
 
     public static Table getTableName(String identifier) {
@@ -41,7 +47,7 @@ public class SimpleTicketManager {
             return Table.matchIdentifier("ticket");
     }
     public List<Ticket> getTickets(Table table, Ticket.Status status,int total) {
-        if(database == null)
+        if(!available && database == null)
             return Collections.emptyList();
         String where;
         int param;

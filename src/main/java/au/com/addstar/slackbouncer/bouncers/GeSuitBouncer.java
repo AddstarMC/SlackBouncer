@@ -4,11 +4,9 @@ import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Collections;
 
-import au.com.addstar.slackapi.objects.Attachment;
-import au.com.addstar.slackapi.MessageOptions;
-import au.com.addstar.slackapi.objects.Attachment.AttachmentField;
-import au.com.addstar.slackapi.MessageOptions.ParseMode;
 import au.com.addstar.slackbouncer.BouncerChannel;
+import io.github.slackapi4j.MessageOptions;
+import io.github.slackapi4j.objects.Attachment;
 import net.cubespace.Yamler.Config.ConfigSection;
 import net.cubespace.geSuit.events.BanPlayerEvent;
 import net.cubespace.geSuit.events.UnbanPlayerEvent;
@@ -46,7 +44,7 @@ public class GeSuitBouncer implements ISlackOutgoingBouncer, Listener
 			return;
 		
 		Attachment attachment = new Attachment("");
-		attachment.addField(new AttachmentField("Reason", event.getReason(), false));
+		attachment.addField(new Attachment.AttachmentField("Reason", event.getReason(), false));
 		switch (event.getType())
 		{
 		default:
@@ -59,13 +57,13 @@ public class GeSuitBouncer implements ISlackOutgoingBouncer, Listener
 			attachment.setFallback(String.format("BanNotice: %s (%s) was IP banned by %s", event.getPlayerName(), event.getPlayerIP().getHostAddress(), event.getBannedBy()));
 			attachment.setTitle("IP Ban");
 			attachment.setText(String.format("%s has been ip banned by %s.", event.getPlayerName(), event.getBannedBy()));
-			attachment.addField(new AttachmentField("IP", event.getPlayerIP().getHostAddress(), true));
+			attachment.addField(new Attachment.AttachmentField("IP", event.getPlayerIP().getHostAddress(), true));
 			break;
 		case Temporary:
 			attachment.setFallback(String.format("BanNotice: %s was temp banned by %s until %s", event.getPlayerName(), event.getBannedBy(), DateFormat.getDateTimeInstance().format(event.getUnbanDate())));
 			attachment.setTitle("Temp Ban");
 			attachment.setText(String.format("%s has been temp banned by %s.", event.getPlayerName(), event.getBannedBy()));
-			attachment.addField(new AttachmentField("Until", DateFormat.getDateTimeInstance().format(event.getUnbanDate()), true));
+			attachment.addField(new Attachment.AttachmentField("Until", DateFormat.getDateTimeInstance().format(event.getUnbanDate()), true));
 			break;
 		}
 		
@@ -77,7 +75,7 @@ public class GeSuitBouncer implements ISlackOutgoingBouncer, Listener
 			.username("Ban Bot")
 			.asUser(false)
 			.attachments(Collections.singletonList(attachment))
-			.mode(ParseMode.Full)
+			.mode(MessageOptions.ParseMode.Full)
 			.build();
 		
 		mChannel.sendMessage("", options);
@@ -93,11 +91,11 @@ public class GeSuitBouncer implements ISlackOutgoingBouncer, Listener
 		attachment.setTitle("Warn");
 		attachment.setColor("warning");
 		attachment.setText(String.format("%s has been warned by %s.", event.getPlayerName(), event.getBy()));
-		attachment.addField(new AttachmentField("Reason", event.getReason(), false));
+		attachment.addField(new Attachment.AttachmentField("Reason", event.getReason(), false));
 		if (event.getActionExtra().isEmpty())
-			attachment.addField(new AttachmentField("Action", String.format("#%d - %s", event.getWarnCount(), event.getAction()), true));
+			attachment.addField(new Attachment.AttachmentField("Action", String.format("#%d - %s", event.getWarnCount(), event.getAction()), true));
 		else
-			attachment.addField(new AttachmentField("Action", String.format("#%d - %s %s", event.getWarnCount(), event.getAction(), event.getActionExtra()), true));
+			attachment.addField(new Attachment.AttachmentField("Action", String.format("#%d - %s %s", event.getWarnCount(), event.getAction(), event.getActionExtra()), true));
 		
 		attachment.setFormatText(false);
 		attachment.setFormatFields(true);
@@ -106,7 +104,7 @@ public class GeSuitBouncer implements ISlackOutgoingBouncer, Listener
 			.username("Warn Bot")
 			.asUser(false)
 			.attachments(Collections.singletonList(attachment))
-			.mode(ParseMode.Full)
+			.mode(MessageOptions.ParseMode.Full)
 			.build();
 		
 		mChannel.sendMessage("", options);
@@ -131,7 +129,7 @@ public class GeSuitBouncer implements ISlackOutgoingBouncer, Listener
 			.username("Ban Bot")
 			.asUser(false)
 			.attachments(Collections.singletonList(attachment))
-			.mode(ParseMode.Full)
+			.mode(MessageOptions.ParseMode.Full)
 			.build();
 		
 		mChannel.sendMessage("", options);

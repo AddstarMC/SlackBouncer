@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import au.com.addstar.slackapi.MessageOptions;
 import au.com.addstar.slackbouncer.commands.ISlackCommandHandler;
 import au.com.addstar.slackbouncer.commands.SlackCommandSender;
 import com.google.common.base.Strings;
@@ -18,11 +17,12 @@ import au.com.addstar.bc.BungeeChat;
 import au.com.addstar.bc.config.ChatChannel;
 import au.com.addstar.bc.event.BCChatEvent;
 import au.com.addstar.bc.sync.packet.MirrorPacket;
-import au.com.addstar.slackapi.objects.Message.MessageType;
-import au.com.addstar.slackapi.objects.User;
 import au.com.addstar.slackbouncer.BouncerChannel;
 import au.com.addstar.slackbouncer.SlackUtils;
 import com.google.common.collect.Queues;
+import io.github.slackapi4j.MessageOptions;
+import io.github.slackapi4j.objects.Message;
+import io.github.slackapi4j.objects.User;
 import net.cubespace.Yamler.Config.ConfigSection;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.api.ChatColor;
@@ -150,9 +150,9 @@ public class BungeeChatBouncer implements ISlackIncomingBouncer, ISlackOutgoingB
 	}
 	
 	@Override
-	public void onMessage( String message, User sender, MessageType type )
+	public void onMessage( String message, User sender, Message.MessageType type )
 	{
-		if (type != MessageType.Normal)
+		if (type != Message.MessageType.Normal)
 			return;
 		
 		message = SlackUtils.toMC(message);

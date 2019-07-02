@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  * Created for the Charlton IT Project.
  * Created by benjicharlton on 25/06/2019.
  */
-public class MySQLConnection {
+public class MySQLConnection implements Database{
     private static Logger log = Logger.getLogger("SlackBouncer");
     private String hostname;
     private String port;
@@ -29,11 +29,7 @@ public class MySQLConnection {
         this.port = port;
         this.properties = properties;
         this.database = database;
-        try {
-            this.open();
-        }catch (SQLException e){
-            log.warning("MYSQL Database will not be available.");
-        }
+        this.open();
     }
 
     public Connection getConnection() throws SQLException {
@@ -52,7 +48,8 @@ public class MySQLConnection {
         try {
             Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException e) {
-            log.warning("");
+            log.warning(e.getMessage());
+            throw new SQLException(e.getMessage());
         }
         url = "jdbc:mysql://" + this.hostname + ":" + this.port + "/" + this.database;
         this.connection = DriverManager.getConnection(url, this.properties);

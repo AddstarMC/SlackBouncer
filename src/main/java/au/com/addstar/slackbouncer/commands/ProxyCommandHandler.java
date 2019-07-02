@@ -12,10 +12,8 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 
-import au.com.addstar.slackapi.objects.Attachment;
-import au.com.addstar.slackapi.MessageOptions;
-import au.com.addstar.slackapi.objects.Attachment.AttachmentField;
-import au.com.addstar.slackapi.MessageOptions.ParseMode;
+import io.github.slackapi4j.MessageOptions;
+import io.github.slackapi4j.objects.Attachment;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -80,14 +78,14 @@ public class ProxyCommandHandler implements ISlackCommandHandler
 		{
 			List<String> groupPlayers = Lists.newArrayList(groups.get(key));
 			Collections.sort(groupPlayers);
-			attachment.addField(new AttachmentField(String.format("%s (%d players)", key, groupPlayers.size()), Joiner.on(", ").join(groupPlayers), false));
+			attachment.addField(new Attachment.AttachmentField(String.format("%s (%d players)", key, groupPlayers.size()), Joiner.on(", ").join(groupPlayers), false));
 		}
 		
 		sender.sendMessage("", 
 			MessageOptions.builder()
 				.asUser(true)
 				.attachments(Collections.singletonList(attachment))
-				.mode(ParseMode.None)
+				.mode(MessageOptions.ParseMode.None)
 				.build()
 			);
 	}
