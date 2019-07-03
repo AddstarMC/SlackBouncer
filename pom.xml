@@ -56,6 +56,10 @@
           <id>central</id>
           <url>http://repo1.maven.org/maven2/</url>
       </repository>
+      <repository>
+          <id>ossrh</id>
+          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      </repository>
   </repositories>
 
   <dependencies>
@@ -80,7 +84,7 @@
   	<dependency>
   	  <groupId>io.github.slackapi4j</groupId>
   	  <artifactId>slack-api-4j</artifactId>
-  	  <version>0.0.2</version>
+  	  <version>0.0.3-SNAPSHOT</version>
   	  <scope>compile</scope>
   	</dependency>
   	<dependency>

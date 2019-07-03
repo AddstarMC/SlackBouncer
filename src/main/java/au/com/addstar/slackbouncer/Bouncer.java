@@ -6,16 +6,15 @@ import java.util.concurrent.TimeUnit;
 
 import io.github.slackapi4j.RealTimeSession;
 import io.github.slackapi4j.SlackAPI;
-import io.github.slackapi4j.eventListeners.RealTimeListener;
+import io.github.slackapi4j.eventListeners.MessageListener;
 import io.github.slackapi4j.events.MessageEvent;
-import io.github.slackapi4j.events.RealTimeEvent;
 import io.github.slackapi4j.exceptions.SlackException;
 import io.github.slackapi4j.exceptions.SlackRTException;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 
-public class Bouncer implements RealTimeListener
+public class Bouncer extends MessageListener
 {
 	private final BouncerPlugin plugin;
 	private final SlackAPI slack;
@@ -74,6 +73,7 @@ public class Bouncer implements RealTimeListener
 	
 	private void connect()
 	{
+	    session.addListener(new ConversationListener(plugin));
 		synchronized(lockObject)
 		{
 			if (session != null || isConnecting)
@@ -123,18 +123,14 @@ public class Bouncer implements RealTimeListener
 	@Override
 	public void onLoginComplete()
 	{
-		plugin.getLogger().info("Logged into Slack as " + session.getSelf().getName());
-		plugin.onLoginComplete();
 	}
 
-	@Override
-	public void onEvent( RealTimeEvent event )
-	{
-		if (event instanceof MessageEvent)
-			plugin.onMessage((MessageEvent)event);
-	}
+    @Override
+    public void onEvent(MessageEvent event) {
+        ProxyServer.getInstance().getScheduler().runAsync(plugin,()->plugin.onMessage(event));
+    }
 
-	@Override
+    @Override
 	public void onError( SlackRTException exception )
 	{
 		plugin.getLogger().warning("An error occured: " + exception.toString());

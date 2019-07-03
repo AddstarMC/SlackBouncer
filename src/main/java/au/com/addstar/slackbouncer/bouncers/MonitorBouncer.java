@@ -14,8 +14,8 @@ import net.md_5.bungee.event.EventHandler;
  * Created for the AddstarMC Project. Created by Narimm on 19/02/2019.
  */
 public class MonitorBouncer implements ISlackOutgoingBouncer, Listener {
-    private static Map<ProxiedPlayer, User> watched = new HashMap<>();
-    private BouncerChannel channel;
+    private static final Map<ProxiedPlayer, User> watched = new HashMap<>();
+    private final BouncerChannel channel;
     private boolean enabled;
     
     public MonitorBouncer(BouncerChannel channel) {

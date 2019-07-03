@@ -14,11 +14,11 @@ import java.util.logging.Logger;
  * Created by benjicharlton on 25/06/2019.
  */
 public class MySQLConnection implements Database{
-    private static Logger log = Logger.getLogger("SlackBouncer");
+    private static final Logger log = Logger.getLogger("SlackBouncer");
     private String hostname;
     private String port;
     private String database;
-    private Properties properties;
+    private final Properties properties;
     private Connection connection;
 
     public MySQLConnection(String host,String port, String database, Properties properties) throws SQLException {
@@ -44,14 +44,13 @@ public class MySQLConnection implements Database{
     }
 
     public void open() throws SQLException{
-        String url = "";
         try {
             Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException e) {
             log.warning(e.getMessage());
             throw new SQLException(e.getMessage());
         }
-        url = "jdbc:mysql://" + this.hostname + ":" + this.port + "/" + this.database;
+        String url = "jdbc:mysql://" + this.hostname + ":" + this.port + "/" + this.database;
         this.connection = DriverManager.getConnection(url, this.properties);
     }
 

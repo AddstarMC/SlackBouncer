@@ -1,7 +1,6 @@
 package au.com.addstar.slackbouncer.bouncers;
 
 import java.text.DateFormat;
-import java.util.Arrays;
 import java.util.Collections;
 
 import au.com.addstar.slackbouncer.BouncerChannel;
@@ -18,7 +17,7 @@ public class GeSuitBouncer implements ISlackOutgoingBouncer, Listener
 {
 
 
-	private BouncerChannel mChannel;
+	private final BouncerChannel mChannel;
 	
 	private boolean showBans;
 	private boolean showUnbans;

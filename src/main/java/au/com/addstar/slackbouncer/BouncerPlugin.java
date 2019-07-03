@@ -4,27 +4,23 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 
 import au.com.addstar.slackbouncer.bouncers.*;
 import au.com.addstar.slackbouncer.commands.*;
-import io.github.slackapi4j.MessageOptions;
 import io.github.slackapi4j.events.MessageEvent;
 import io.github.slackapi4j.exceptions.SlackException;
-import io.github.slackapi4j.internal.Utilities;
-import io.github.slackapi4j.objects.Attachment;
-import io.github.slackapi4j.objects.Conversation;
-import io.github.slackapi4j.objects.Message;
-import io.github.slackapi4j.objects.User;
+import io.github.slackapi4j.objects.*;
+import io.github.slackapi4j.objects.blocks.Block;
+import io.github.slackapi4j.objects.blocks.Divider;
+import io.github.slackapi4j.objects.blocks.Section;
+import io.github.slackapi4j.objects.blocks.composition.TextObject;
 import net.cubespace.Yamler.Config.ConfigSection;
 import net.md_5.bungee.api.plugin.Plugin;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -32,25 +28,27 @@ import com.google.common.collect.Maps;
 
 import au.com.addstar.slackbouncer.config.ChannelDefinition;
 import au.com.addstar.slackbouncer.config.MainConfig;
+import org.jetbrains.annotations.NotNull;
 
 public class BouncerPlugin extends Plugin
 {
-	private Map<String, Constructor<? extends ISlackIncomingBouncer>> incomingRegistrations;
-	private Map<String, Constructor<? extends ISlackOutgoingBouncer>> outgoingRegistrations;
-	private Map<String, ISlackCommandHandler> commandHandlers;
+	private final Map<String, Constructor<? extends ISlackIncomingBouncer>> incomingRegistrations;
+	private final Map<String, Constructor<? extends ISlackOutgoingBouncer>> outgoingRegistrations;
+	private final Map<String, ISlackCommandHandler> commandHandlers;
 	
 	private MainConfig config;
 	private Bouncer bouncer;
 	//private MonitorBouncer monitor;
 
-	private List<BouncerChannel> channels;
-	
+	private final List<BouncerChannel> channels;
+	private final WeakHashMap<ObjectID,Conversation> conversations;//this is a list of conversations that were not found by in the Session
 	public BouncerPlugin()
 	{
 		incomingRegistrations = Maps.newHashMap();
 		outgoingRegistrations = Maps.newHashMap();
 		commandHandlers = Maps.newHashMap();
 		channels = Lists.newArrayList();
+		conversations = new WeakHashMap<>();
 	}
 	
 	@Override
@@ -59,7 +57,7 @@ public class BouncerPlugin extends Plugin
 		config = new MainConfig(new File(getDataFolder(), "config.yml"));
 		if (getProxy().getPluginManager().getPlugin("BungeeChat") != null)
 		{
-			registerIncomingBouncer("bungeechat", BungeeChatBouncer.class);
+			registerIncomingBouncer(BungeeChatBouncer.class);
 			registerOutgoingBouncer("bungeechat", BungeeChatBouncer.class);
 		}
 		
@@ -71,14 +69,14 @@ public class BouncerPlugin extends Plugin
 			registerCommandHandler(new AdminCommandHandler(), "restart");
 		}
 
-		registerCommandHandler(new ProxyCommandHandler(this), "who", "list","watch");
+		registerCommandHandler(new ProxyCommandHandler(this), "who", "list","monitor","watch");
 		registerOutgoingBouncer("monitor", MonitorBouncer.class);
 
 		if (!loadConfig())
 			return;
 		ConfigSection section = config.ticketConfig;
 		if(Boolean.parseBoolean(section.get("enabled"))) {
-            registerCommandHandler(new TicketCommandHandler(section), "tickets", "reply");
+            registerCommandHandler(new TicketCommandHandler(section), "tickets","ideas","reply");
         }else{
 		    getLogger().info("TicketManager is disabled via configuration.");
         }
@@ -122,6 +120,7 @@ public class BouncerPlugin extends Plugin
 		}
 		
 		bouncer = new Bouncer(this);
+
 		return true;
 	}
 	
@@ -136,7 +135,7 @@ public class BouncerPlugin extends Plugin
 		}
 	}
 	
-	public boolean reloadConfig() {
+	protected boolean reloadConfig() {
 		if (bouncer != null) {
 			bouncer.shutdown();
 			bouncer = null;
@@ -146,12 +145,12 @@ public class BouncerPlugin extends Plugin
 
 	}
 	
-	public void registerIncomingBouncer(String name, Class<? extends ISlackIncomingBouncer> bouncerClass)
+	private void registerIncomingBouncer(Class<? extends ISlackIncomingBouncer> bouncerClass)
 	{
 		try
 		{
 			Constructor<? extends ISlackIncomingBouncer> constructor = bouncerClass.getConstructor();
-			incomingRegistrations.put(name.toLowerCase(), constructor);
+			incomingRegistrations.put("bungeechat".toLowerCase(), constructor);
 		}
 		catch (NoSuchMethodException e)
 		{
@@ -159,7 +158,7 @@ public class BouncerPlugin extends Plugin
 		}
 	}
 	
-	public void registerOutgoingBouncer(String name, Class<? extends ISlackOutgoingBouncer> bouncerClass)
+	private void registerOutgoingBouncer(String name, Class<? extends ISlackOutgoingBouncer> bouncerClass)
 	{
 		try
 		{
@@ -278,8 +277,14 @@ public class BouncerPlugin extends Plugin
 			return;
 		
 		String message = SlackUtils.resolveGroups(event.getMessage().getText(), bouncer.getSession());
-		Conversation source = bouncer.getSession().getChannelById(event.getMessage().getConversationID());
-		
+		ObjectID convID = event.getMessage().getConversationID();
+        final Conversation source;
+		try {
+            source = retrieveConversation(convID);
+        }catch (NullPointerException e){
+		    getLogger().info(e.getMessage());
+		    return;
+        }
 		// Command handling
 		if (event.getType() == Message.MessageType.Normal)
 		{
@@ -302,6 +307,31 @@ public class BouncerPlugin extends Plugin
 				channel.onMessage(message, event.getUser(), event.getType());
 		}
 	}
+	@NotNull
+	private Conversation retrieveConversation(ObjectID convID) throws NullPointerException{
+        conversations.clear();
+        Conversation source = bouncer.getSession().getChannelById(convID);
+        //its not cached so lets retrieve it
+        if(source ==null){//for some reason the session wont have the DM channel if the user opens one in the session.
+            source = conversations.get(convID);
+            if(source==null) {
+                try {
+                    source = bouncer.getSlack().getConversations().getConversation(convID.toString());
+                    if (source == null) {
+                        getLogger().info("[DEBUG] Channel was null");
+                        throw new NullPointerException("Source Conversation was null");
+                    }
+                    conversations.put(convID, source);
+                } catch (IOException | SlackException e) {
+                    getLogger().info(convID + " could not be retrieved from Slack: " + e.getMessage());
+                    NullPointerException npe = new NullPointerException("Source Conversation was null: "+e.getMessage());
+                    npe.addSuppressed(e);
+                    throw npe;
+                }
+            }
+        }
+        return source;
+    }
 	
 	private void processCommands(User source, Conversation channel, String text)
 	{
@@ -335,29 +365,31 @@ public class BouncerPlugin extends Plugin
 		
 		if (command.equalsIgnoreCase("help") || command.equalsIgnoreCase("commands"))
 		{
-			Attachment attachment = new Attachment("List of commands");
-			attachment.setTitle("The following commands are available");
-			
-			List<String> commands = Lists.newArrayList(commandHandlers.keySet());
-			Collections.sort(commands);
-			
-			for (int i = 0; i < commands.size(); ++i)
-			{
-				String cmd = commands.get(i);
-				ISlackCommandHandler handler = commandHandlers.get(cmd);
-				if (handler != null)
-					cmd = handler.getUsage(cmd);
-				
-				if (cmd != null)
-					commands.set(i, cmd);
-			}
-			
-			attachment.setText(Joiner.on('\n').join(commands));
-			attachment.setFormatText(false);
+		    List<Block> messageBlocks = new ArrayList<>();
+		    Section section = new Section();
+            TextObject title = new TextObject();
+            title.setType(TextObject.TextType.MARKDOWN);
+            title.setText("List of commands");
+            section.setText(title);
+            messageBlocks.add(section);
+            Divider divider = new Divider();
+            messageBlocks.add(divider);
+            Section subsect = new Section();
+            TextObject subHead = new TextObject();
+            subHead.setText("The following commands are available");
+            subsect.setText(subHead);
+            List<TextObject> fields = new ArrayList<>();
+            commandHandlers.keySet().stream().sorted().forEach(s -> {
+                TextObject command1 = new TextObject();
+                ISlackCommandHandler handler = commandHandlers.get(s);
+                command1.setText(handler.getUsage(s));
+                fields.add(command1);
+            });
+            subsect.setFields(fields);
             Message out = Message.builder()
                     .conversationID(channel.getId())
                     .userId(sender.getUser().getId())
-                    .attachments(Collections.singletonList(attachment))
+                    .blocks(messageBlocks)
                     .build();
             sender.sendEphemeral(out);
 			return;

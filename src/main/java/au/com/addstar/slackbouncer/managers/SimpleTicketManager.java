@@ -50,9 +50,7 @@ public class SimpleTicketManager {
         if(!available && database == null)
             return Collections.emptyList();
         String where;
-        int param;
         where = " status = ?";
-        param = 1;
         String limit;
         if(total > 0 )
             limit = " LIMIT "+total;
@@ -62,7 +60,7 @@ public class SimpleTicketManager {
         List<Ticket> tickets = new ArrayList<>();
         try(
                 Connection con = database.getConnection();
-                PreparedStatement statement = con.prepareStatement(sql);
+                PreparedStatement statement = con.prepareStatement(sql)
         ) {
             statement.setString(1, status.name());
             ResultSet result = statement.executeQuery();

@@ -127,11 +127,12 @@ public class Ticket {
             return !this.userReply.equalsIgnoreCase("NONE");
         }
 
-        public static enum Status {
+        @SuppressWarnings("unused")
+        public enum Status {
             OPEN,
             CLOSE;
 
-            private Status() {
+            Status() {
             }
         }
 }

@@ -12,7 +12,7 @@ import net.md_5.bungee.api.ChatColor;
 
 public class SlackUtils
 {
-	private static Pattern groupPattern = Pattern.compile("<(.*?)>");
+	private static final Pattern groupPattern = Pattern.compile("<(.*?)>");
 	
 	public static String resolveGroups(String message, RealTimeSession session)
 	{

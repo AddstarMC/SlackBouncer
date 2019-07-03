@@ -1,8 +1,8 @@
 package au.com.addstar.slackbouncer.objects;
 
-/**
- * Created for the Charlton IT Project.
- * Created by benjicharlton on 25/06/2019.
+/*
+  Created for the Charlton IT Project.
+  Created by benjicharlton on 25/06/2019.
  */
 import java.util.HashMap;
 import java.util.Map;
@@ -11,8 +11,8 @@ public enum Table {
     IDEA("SHT_Ideas", "idea"),
     TICKET("SHT_Tickets", "ticket");
 
-    private static final Map<String, Table> BY_TYPE = new HashMap();
-    private static final Map<String, Table> BY_TABLENAME = new HashMap();
+    private static final Map<String, Table> BY_TYPE = new HashMap<>();
+    private static final Map<String, Table> BY_TABLENAME = new HashMap<>();
 
     static {
         Table[] var3 = values();
@@ -30,7 +30,7 @@ public enum Table {
     public String tableName;
     public String type;
 
-    private Table(String tableName, String name) {
+    Table(String tableName, String name) {
         this.tableName = tableName;
         this.type = name;
     }

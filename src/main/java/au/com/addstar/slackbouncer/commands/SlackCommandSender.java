@@ -25,15 +25,15 @@ import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 public class SlackCommandSender implements CommandSender
 {
-	private BouncerPlugin plugin;
-	private Bouncer bouncer;
+	private final BouncerPlugin plugin;
+	private final Bouncer bouncer;
 
 	public User getUser() {
 		return user;
 	}
 
 	private final User user;
-	private Conversation channel;
+	private final Conversation channel;
 	
 	private boolean hasDoneTarget;
 	

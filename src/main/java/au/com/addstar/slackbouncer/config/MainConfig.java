@@ -31,9 +31,9 @@ public class MainConfig extends YamlConfig
         ticketConfig.set("MYSQL", mysql);
 	}
 	
-	public String token = "*unspecified*";
-	public Map<String, ChannelDefinition> channels;
-	public List<String> commandHandlers;
-	public ConfigSection ticketConfig;
+	public final String token = "*unspecified*";
+	public final Map<String, ChannelDefinition> channels;
+	public final List<String> commandHandlers;
+	public final ConfigSection ticketConfig;
 
 }

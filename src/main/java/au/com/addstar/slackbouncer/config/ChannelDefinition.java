@@ -15,8 +15,8 @@ public class ChannelDefinition extends YamlConfig
 		outgoing = Maps.newHashMap();
 	}
 	
-	public Map<String, ConfigSection> incoming;
-	public Map<String, ConfigSection> outgoing;
+	public final Map<String, ConfigSection> incoming;
+	public final Map<String, ConfigSection> outgoing;
 	
 	@Override
 	public String toString()

@@ -47,12 +47,7 @@ public class BouncerChannel
 	{
 		return name;
 	}
-	
-	public BouncerPlugin getPlugin()
-	{
-		return plugin;
-	}
-	
+
 	public Conversation getSlackChannel()
 	{
 		return slackChannel;
@@ -132,7 +127,11 @@ public class BouncerChannel
 	{
 		try
 		{
-			plugin.getBouncer().getSlack().sendMessage(message, slackChannel, options);
+		    Message message1 = Message.builder()
+                    .conversationID(slackChannel.getId())
+                    .text(message)
+                    .build();
+		    plugin.getBouncer().getSlack().sendMessage(message1,options);
 		}
 		catch (IOException e)
 		{
@@ -152,7 +151,11 @@ public class BouncerChannel
 	{
 		try
 		{
-			plugin.getBouncer().getSlack().sendMessage(String.format("<@%s> %s", target.getId(), message), slackChannel, options);
+		    Message message1 = Message.builder()
+                .conversationID(slackChannel.getId())
+                .text(String.format("<@%s> %s", target.getId(), message))
+                .build();
+			plugin.getBouncer().getSlack().sendMessage(message1, options);
 		}
 		catch (IOException e)
 		{

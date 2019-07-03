@@ -7,8 +7,8 @@ import net.md_5.bungee.api.plugin.Command;
 
 public class BouncerCommand extends Command
 {
-	private BouncerPlugin plugin;
-	public BouncerCommand(BouncerPlugin plugin)
+	private final BouncerPlugin plugin;
+	BouncerCommand(BouncerPlugin plugin)
 	{
 		super("!slack", "slackbouncer.command", "slackbouncer");
 		this.plugin = plugin;
@@ -28,8 +28,11 @@ public class BouncerCommand extends Command
 			switch (args[0].toLowerCase())
 			{
 			case "reload":
-				plugin.reloadConfig();
-				sender.sendMessage(TextComponent.fromLegacyText("Bouncer has been reloaded"));
+				if(plugin.reloadConfig()) {
+                    sender.sendMessage(TextComponent.fromLegacyText("Bouncer has been reloaded"));
+                } else {
+                    sender.sendMessage(TextComponent.fromLegacyText("Bouncer was unable to be reloaded"));
+                }
 				break;
 			}
 		}

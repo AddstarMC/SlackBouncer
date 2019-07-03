@@ -1,25 +1,28 @@
 package au.com.addstar.slackbouncer.commands;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 import au.com.addstar.slackbouncer.BouncerPlugin;
 import au.com.addstar.slackbouncer.bouncers.MonitorBouncer;
-import com.google.common.base.Joiner;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
-
-import io.github.slackapi4j.MessageOptions;
-import io.github.slackapi4j.objects.Attachment;
+import io.github.slackapi4j.objects.Message;
+import io.github.slackapi4j.objects.blocks.Block;
+import io.github.slackapi4j.objects.blocks.Divider;
+import io.github.slackapi4j.objects.blocks.Section;
+import io.github.slackapi4j.objects.blocks.composition.TextObject;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 public class ProxyCommandHandler implements ISlackCommandHandler
 {
-	private BouncerPlugin plugin;
+	private final BouncerPlugin plugin;
 	public ProxyCommandHandler(BouncerPlugin plugin) {
 		this.plugin = plugin;
 	}
@@ -40,6 +43,7 @@ public class ProxyCommandHandler implements ISlackCommandHandler
 			onWho(sender);
 			break;
 		case "monitor":
+		case "watch":
 			if(args.length < 1) {
 			   throw new IllegalArgumentException("Please add a player to add");
 			}
@@ -56,10 +60,13 @@ public class ProxyCommandHandler implements ISlackCommandHandler
 	public void onWho(SlackCommandSender sender)
 	{
 		Collection<ProxiedPlayer> players = ProxyServer.getInstance().getPlayers();
-		Attachment attachment = new Attachment(players.size() + " players online");
-		attachment.setTitle(players.size() + " players online");
-		attachment.setFormatFields(false);
-
+		List<Block> messageBlocks = new ArrayList<>();
+		Section section = new Section();
+        TextObject title = TextObject.builder().text((players.size()>0?":warning: ":":information_source: ")+
+                players.size() + " players online").type(TextObject.TextType.MARKDOWN).build();
+        section.setText(title);
+        messageBlocks.add(section);
+        messageBlocks.add(new Divider());
 		ListMultimap<String, String> groups = ArrayListMultimap.create();
 		for (ProxiedPlayer player : players)
 		{
@@ -71,23 +78,30 @@ public class ProxyCommandHandler implements ISlackCommandHandler
 			
 			groups.put(serverName, player.getDisplayName());
 		}
-		
 		List<String> sortedKeys = Lists.newArrayList(groups.keySet());
 		Collections.sort(sortedKeys);
 		for(String key : sortedKeys)
 		{
 			List<String> groupPlayers = Lists.newArrayList(groups.get(key));
 			Collections.sort(groupPlayers);
-			attachment.addField(new Attachment.AttachmentField(String.format("%s (%d players)", key, groupPlayers.size()), Joiner.on(", ").join(groupPlayers), false));
+			Section server = new Section();
+			server.setText(TextObject.builder().text(String.format("%s (%d players)",
+                    key, groupPlayers.size())).build());
+			List<TextObject> player = groupPlayers
+                    .stream()
+                    .sorted()
+                    .map(input -> TextObject.builder().text(input).build())
+                    .collect(Collectors.toList());
+			server.setFields(player);
+			messageBlocks.add(server);
 		}
-		
-		sender.sendMessage("", 
-			MessageOptions.builder()
-				.asUser(true)
-				.attachments(Collections.singletonList(attachment))
-				.mode(MessageOptions.ParseMode.None)
-				.build()
-			);
-	}
+        Message message = sender.createSlackMessage();
+		message.setBlocks(messageBlocks);
+		message.setText("Who");
+		sender.sendMessage(message);
 
+	}
+    private Function<String, TextObject> getFunc(){
+	    return input -> TextObject.builder().text(input).build();
+    }
 }

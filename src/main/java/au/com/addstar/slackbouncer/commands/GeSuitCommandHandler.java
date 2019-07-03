@@ -39,6 +39,10 @@ public class GeSuitCommandHandler implements ISlackCommandHandler
 			return "banhistory <player|uuid>";
 		case "geo":
 			return "geo <ip>";
+            case "ban":
+                return "ban <ip|player> <reason>";
+            case "unban":
+                return "unban <ip|player>";
 		}
 		
 		return null;

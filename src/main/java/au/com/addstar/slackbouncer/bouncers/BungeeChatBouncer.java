@@ -33,7 +33,7 @@ import net.md_5.bungee.event.EventHandler;
 
 public class BungeeChatBouncer implements ISlackIncomingBouncer, ISlackOutgoingBouncer, Listener, ISlackCommandHandler
 {
-	private Map<String, ChatChannel> mChannels;
+	private static final Pattern mDeTokenPattern = Pattern.compile("\\{(DISPLAYNAME|RAWDISPLAYNAME|NAME|MESSAGE|SERVER|GROUP|WORLD)\\}");
 	private LinkedBlockingQueue<String> messageCache;
 	private Boolean cached;
 	private Integer cacheSize =20;
@@ -99,8 +99,7 @@ public class BungeeChatBouncer implements ISlackIncomingBouncer, ISlackOutgoingB
 		
 		return format;
 	}
-	
-	private static Pattern mDeTokenPattern = Pattern.compile("\\{(DISPLAYNAME|RAWDISPLAYNAME|NAME|MESSAGE|SERVER|GROUP|WORLD)\\}");
+	private final Map<String, ChatChannel> mChannels;
 	private String reformatMessage(String format, String srcMessage)
 	{
 		format = ChatColor.translateAlternateColorCodes('&', format);

@@ -1,13 +1,13 @@
 package au.com.addstar.slackbouncer.objects;
 
 public class TicketLocation {
-    private double x;
-    private double y;
-    private double z;
-    private String world;
-    private float pitch;
-    private float yaw;
-    private String server;
+    private final double x;
+    private final double y;
+    private final double z;
+    private final String world;
+    private final float pitch;
+    private final float yaw;
+    private final String server;
 
     public TicketLocation(Double x, Double y, Double z, String world, Float pitch, Float yaw, String server) {
         this.x = x;

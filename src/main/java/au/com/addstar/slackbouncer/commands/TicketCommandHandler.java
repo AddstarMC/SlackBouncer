@@ -35,9 +35,8 @@ public class TicketCommandHandler implements ISlackCommandHandler {
         properties.put("user", props.has("user")?props.get("user").toString():"username");
         properties.put("password", props.has("password")?props.get("password").toString():"password");
         Logger log = Logger.getLogger("SlackBouncer");
-        MySQLConnection database = null;
         try {
-            database = new MySQLConnection(host, port,dbName, properties);
+            MySQLConnection database = new MySQLConnection(host, port,dbName, properties);
             manager = new SimpleTicketManager(database,log,false);
             enabled = true;
             log.info("TicketManager has been configured - Ticket management is available");
@@ -62,7 +61,8 @@ public class TicketCommandHandler implements ISlackCommandHandler {
             }
             switch (command.toLowerCase()) {
                 case "tickets":
-                    listTickets(sender);
+                case "ideas":
+                    listTickets(command.toLowerCase(),sender);
                     break;
                 case "reply":
                     throw new IllegalArgumentException("Not yet Supported");
@@ -78,8 +78,8 @@ public class TicketCommandHandler implements ISlackCommandHandler {
         message.setText("The ticket manager is not available.");
         sender.sendEphemeral(message);
     }
-    private void listTickets(SlackCommandSender sender){
-        Table table = SimpleTicketManager.getTableName("ticket");
+    private void listTickets(String command,SlackCommandSender sender){
+        Table table = SimpleTicketManager.getTableFromCommandString(command);
         List<Ticket> tickets =  manager.getTickets(table, Ticket.Status.OPEN,5);
         Message message = sender.createSlackMessage();
         TextObject title = new TextObject();
@@ -106,6 +106,8 @@ public class TicketCommandHandler implements ISlackCommandHandler {
             fields.add(createHeader("Expiry"));
             fields.add(normalField(t.getUserReply()));
             fields.add(normalField(t.getExpirationDate().toString()));
+            fields.add(createHeader("Location"));
+            fields.add(normalField(t.getLocation().toString()));
             ticket.setFields(fields);
             message.addBlock(ticket);
         }
