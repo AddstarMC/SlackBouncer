@@ -85,7 +85,7 @@ public class BouncerPlugin extends Plugin {
       return;
     }
     ConfigSection section = config.ticketConfig;
-    Boolean ticketEnable = section.get("enabled");
+    Boolean ticketEnable = section.has("enabled") ? section.get("enabled") : false;
     if (ticketEnable) {
       registerCommandHandler(new TicketCommandHandler(section), "tickets", "ideas", "reply");
     } else {
