@@ -1,4 +1,4 @@
-package au.com.addstar.slackbouncer.commands;
+package au.com.addstar.slackbouncer.objects;
 
 import au.com.addstar.slackbouncer.Bouncer;
 import au.com.addstar.slackbouncer.BouncerPlugin;
