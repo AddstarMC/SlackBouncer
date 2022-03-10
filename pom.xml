@@ -31,14 +31,14 @@
     <!-- Addstar repos -->
     <repository>
       <id>addstar-repo</id>
-      <url>http://maven.addstar.com.au/artifactory/all-release</url>
+      <url>https://maven.addstar.com.au/artifactory/all-release</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
     </repository>
     <repository>
       <id>addstar-snapshot-repo</id>
-      <url>http://maven.addstar.com.au/artifactory/all-snapshot</url>
+      <url>https://maven.addstar.com.au/artifactory/all-snapshot</url>
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
@@ -49,17 +49,17 @@
 
     <!-- BungeeCord repo -->
     <repository>
-      <id>md_5</id>
-      <url>https://oss.sonatype.org/content/groups/public/</url>
+        <id>md_5</id>
+        <url>https://oss.sonatype.org/content/groups/public/</url>
     </repository>
-      <repository>
-          <id>central</id>
-          <url>http://repo1.maven.org/maven2/</url>
-      </repository>
-      <repository>
-          <id>ossrh</id>
-          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-      </repository>
+    <repository>
+        <id>central</id>
+        <url>https://repo1.maven.org/maven2/</url>
+    </repository>
+    <repository>
+        <id>ossrh</id>
+        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </repository>
   </repositories>
 
   <dependencies>
