@@ -1,7 +1,6 @@
 package au.com.addstar.slackbouncer;
 
 import au.com.addstar.slackbouncer.bouncers.AdminBouncer;
-import au.com.addstar.slackbouncer.bouncers.BungeeChatBouncer;
 import au.com.addstar.slackbouncer.bouncers.GeSuitBouncer;
 import au.com.addstar.slackbouncer.bouncers.ISlackIncomingBouncer;
 import au.com.addstar.slackbouncer.bouncers.ISlackOutgoingBouncer;
@@ -66,10 +65,6 @@ public class BouncerPlugin extends Plugin {
   @Override
   public void onEnable() {
     config = new MainConfig(new File(getDataFolder(), "config.yml"));
-    if (getProxy().getPluginManager().getPlugin("BungeeChat") != null) {
-      registerIncomingBouncer(BungeeChatBouncer.class);
-      registerOutgoingBouncer("bungeechat", BungeeChatBouncer.class);
-    }
 
     if (getProxy().getPluginManager().getPlugin("geSuit") != null) {
       registerOutgoingBouncer("gesuit", GeSuitBouncer.class);
@@ -149,7 +144,7 @@ public class BouncerPlugin extends Plugin {
   private void registerIncomingBouncer(Class<? extends ISlackIncomingBouncer> bouncerClass) {
     try {
       Constructor<? extends ISlackIncomingBouncer> constructor = bouncerClass.getConstructor();
-      incomingRegistrations.put("bungeechat".toLowerCase(), constructor);
+      incomingRegistrations.put("chat".toLowerCase(), constructor);
     } catch (NoSuchMethodException e) {
       throw new IllegalArgumentException(bouncerClass.getName() + " does not have a public default constructor");
     }

@@ -4,5 +4,4 @@ author: Schmoller
 
 main: au.com.addstar.slackbouncer.BouncerPlugin
 
-depend: [Yamler]
-softdepend: [BungeeChat, geSuit]
+softdepend: [geSuit]

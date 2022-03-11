@@ -15,10 +15,6 @@
 #        unbans: true
 #  admin-chat:
 #    outgoing:
-#      bungeechat:
-#        channel: AdminChat
-#        cached: true
-#        cacheSize: 20
 #      admin:
 #        channel: AdminChat
 #        allowRestarts: false

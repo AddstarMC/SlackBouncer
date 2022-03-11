@@ -70,12 +70,11 @@
         <scope>provided</scope>
 </dependency>
     <dependency>
-        <groupId>au.com.addstar</groupId>
-        <artifactId>BungeeChat-Proxy</artifactId>
-        <version>1.3.0-SNAPSHOT</version>
-        <scope>provided</scope>
+        <groupId>net.cubespace</groupId>
+        <artifactId>Yamler-Core</artifactId>
+        <version>2.4.0-SNAPSHOT</version>
     </dependency>
-    <dependency>
+      <dependency>
         <groupId>io.github.slackapi4j</groupId>
         <artifactId>slack-api-4j</artifactId>
         <version>0.0.3-SNAPSHOT</version>
