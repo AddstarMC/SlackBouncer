@@ -171,6 +171,7 @@ public class SlackCommandSender implements CommandSender {
       e.printStackTrace();
     } catch (SlackException e) {
       plugin.getLogger().severe("Slack refused the message with: " + e.getMessage());
+      e.printStackTrace();
     }
   }
 
@@ -182,6 +183,7 @@ public class SlackCommandSender implements CommandSender {
       e.printStackTrace();
     } catch (SlackException e) {
       plugin.getLogger().severe("Slack refused the message with: " + e.getMessage());
+      e.printStackTrace();
     }
   }
 

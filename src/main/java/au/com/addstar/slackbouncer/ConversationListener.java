@@ -34,9 +34,10 @@ public class ConversationListener extends ConversationEventListener {
   public void onLoginComplete() {
     plugin.getLogger().info("Logged into Slack as " + session.getSelf().getName());
     plugin.onLoginComplete();
-    for (Conversation c : session.getAllChannels()) {
-      session.sendMessage(session.getSelf().getName() + " is online.", c);
-    }
+    plugin.getLogger().info("Listening in " + session.getAllChannels().size() + " Slack channels.");
+    /*for (Conversation c : session.getAllChannels()) {
+      plugin.getLogger().info("  - " + c.getName() + " (" + c.getNumMembers() + " members)");
+    }*/
   }
 
   @Override
@@ -46,9 +47,7 @@ public class ConversationListener extends ConversationEventListener {
 
   @Override
   public void onClose() {
-    for (Conversation c : session.getAllChannels()) {
-      session.sendMessage(session.getSelf().getName() + " is offline.", c);
-    }
+    log.info("Slack connection closed.");
   }
 
   @Override
@@ -63,7 +62,7 @@ public class ConversationListener extends ConversationEventListener {
           Message message = Message.builder()
               .conversationID(event.getConversationID())
               .userId(userID)
-              .text("I can process commands for you in this channel just use @"
+              .text("<@" + userID.getId() + "> I can process commands for you in this channel just use @"
                   + session.getSelf().getName())
               .build();
           try {

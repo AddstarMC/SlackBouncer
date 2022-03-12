@@ -16,6 +16,10 @@ import au.com.addstar.slackbouncer.config.MainConfig;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import io.github.slackapi4j.events.MessageEvent;
 import io.github.slackapi4j.exceptions.SlackException;
 import io.github.slackapi4j.objects.Conversation;
@@ -335,35 +339,70 @@ public class BouncerPlugin extends Plugin {
 
     if (command.equalsIgnoreCase("help") || command.equalsIgnoreCase("commands")) {
       List<Block> messageBlocks = new ArrayList<>();
-      Section section = new Section();
+
       TextObject title = TextObject.builder()
           .type(TextObject.TextType.MARKDOWN).text("List of commands")
           .build();
-      section.setText(title);
+
+      TextObject title2 = TextObject.builder()
+              .type(TextObject.TextType.PLAIN).text("List of commands")
+              .build();
+
+      Section section = new Section();
+      section.setText(title2);
       messageBlocks.add(section);
+
       messageBlocks.add(new Divider());
-      Section subsect = new Section();
+
+      /*Section subsect = new Section();
       TextObject subHead = TextObject.builder()
           .text("The following commands are available").build();
       subsect.setText(subHead);
       messageBlocks.add(subsect);
+
       Section helpText = new Section();
       final StringBuilder commandHelp = new StringBuilder();
       final AtomicInteger i = new AtomicInteger(1);
+
       commandHandlers.keySet().stream().sorted().forEach(s -> {
         ISlackCommandHandler handler = commandHandlers.get(s);
         commandHelp.append(i.get()).append(". ").append(handler.getUsage(s)).append(System.lineSeparator());
         i.incrementAndGet();
-      });
-      helpText.setText(TextObject.builder().text(commandHelp.toString()).build());
-      messageBlocks.add(helpText);
-      messageBlocks.add(new Divider());
+      });*/
+
+      //helpText.setText(TextObject.builder().text(commandHelp.toString()).build());
+      //messageBlocks.add(helpText);
+      //messageBlocks.add(new Divider());
+
       Message out = Message.builder()
           .conversationID(channel.getId())
           .userId(sender.getUser().getId())
           .text("Command Help")
           .blocks(messageBlocks)
           .build();
+
+      GsonBuilder gbuilder = new GsonBuilder();
+      Gson gson = gbuilder.create();
+      JsonElement obj = gson.toJsonTree(out);
+      JsonObject jobj = obj.getAsJsonObject();
+      getLogger().info("JSON: " + jobj.toString());
+      //this.addDefaultOptions(out, options);
+      //JsonObject root = this.connection.callMethodHandled(SlackConstants.CHAT_POSTEMPHEMERAL, out);
+      //return (Message)this.gson.fromJson(root.get("message"), Message.class);
+
+      for (Block block : out.getBlocks()) {
+        if (block instanceof Section) {
+          Section s = (Section) block;
+          getLogger().info("Block " + block.getType() + " = " + s.getText().getText());
+        }
+        else if (block instanceof Divider) {
+          Divider d = (Divider) block;
+          getLogger().info("Block " + block.getType());
+        }
+        else {
+          getLogger().info("Unknown Block " + block.getType());
+        }
+      }
       sender.sendEphemeral(out);
       return;
     }
@@ -374,14 +413,13 @@ public class BouncerPlugin extends Plugin {
           .userId(sender.getUser().getId())
           .conversationID(channel.getId())
           .subtype(Message.MessageType.Normal)
-          .text("I dont know what to do with _" + command + "_")
+          .text("<@" + sender.getUser().getId() + "> Unknown command \"_" + command + "_\"")
           .build();
       try {
-        bouncer.getSlack().sendEphemeral(message);
-      } catch (IOException | SlackException e) {
+        bouncer.getSlack().sendMessage(message);
+      } catch (Exception e) {
         e.printStackTrace();
       }
-      //sender.sendMessage("I dont know what to do with _" + command + "_");
       return;
     }
 

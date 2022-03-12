@@ -57,12 +57,15 @@ public class Bouncer extends MessageListener {
 
   private void startReconnectionTask() {
     checkTask = plugin.getProxy().getScheduler().schedule(plugin, () -> {
-      if (!isConnecting && session == null)
+      if (!isConnecting && session == null) {
+        plugin.getLogger().info("Re-connecting to Slack...");
         connect();
+      }
     }, 10, 10, TimeUnit.SECONDS);
   }
 
   private void connect() {
+    plugin.getLogger().info("Connecting to Slack...");
     synchronized (lockObject) {
       if (session != null || isConnecting)
         return;
