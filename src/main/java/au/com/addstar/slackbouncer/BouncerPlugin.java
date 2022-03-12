@@ -58,12 +58,6 @@ public class BouncerPlugin extends Plugin
 	{
 		config = new MainConfig(new File(getDataFolder(), "config.yml"));
 		
-		if (getProxy().getPluginManager().getPlugin("BungeeChat") != null)
-		{
-			registerIncomingBouncer("bungeechat", BungeeChatBouncer.class);
-			registerOutgoingBouncer("bungeechat", BungeeChatBouncer.class);
-		}
-		
 		if (getProxy().getPluginManager().getPlugin("geSuit") != null)
 		{
 			registerOutgoingBouncer("gesuit", GeSuitBouncer.class);
