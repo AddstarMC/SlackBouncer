@@ -31,7 +31,7 @@ public class Bouncer implements RealTimeListener
 		
 		slack = new SlackAPI(plugin.getConfig().token);
 		connect();
-		startReconnectionTask();
+		//startReconnectionTask();
 	}
 	
 	public SlackAPI getSlack()
